@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "claude": "claude"
+    "claude": "node node_modules/@anthropic-ai/claude-code/cli.js"
   },
   "dependencies": {
     "@anthropic-ai/claude-code": "^1.0.123"
