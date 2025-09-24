@@ -23,12 +23,13 @@ This approach ensures optimal performance, native iOS aesthetics, and seamless i
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
 | 2025-09-23 | 1.0 | Initial architecture document creation | Winston (Architect) |
+| 2025-09-24 | 1.1 | Added StoreKit 2 subscription infrastructure (Epic 7) | Winston (Architect) |
 
 ## High Level Architecture
 
 ### Technical Summary
 
-This iOS-native application employs a **client-heavy architecture** with CloudKit as the serverless backend, requiring **iOS 15.0+** to leverage the modern Family Controls framework. The app uses SwiftUI with reactive MVVM pattern, integrating the Family Controls framework for robust screen time enforcement and iCloud Family Sharing for automatic family member discovery. CloudKit zone-based architecture provides granular data isolation per child with a shared zone for family settings. The system includes WidgetKit extensions for real-time progress visibility, App Intents for Siri integration, and Background Tasks framework for accurate point reconciliation. This architecture achieves PRD goals while maximizing Apple ecosystem strengths—native enforcement, zero backend maintenance, and privacy-first design with built-in COPPA compliance.
+This iOS-native application employs a **client-heavy architecture** with CloudKit as the serverless backend, requiring **iOS 15.0+** to leverage the modern Family Controls framework. The app uses SwiftUI with reactive MVVM pattern, integrating the Family Controls framework for robust screen time enforcement and iCloud Family Sharing for automatic family member discovery. CloudKit zone-based architecture provides granular data isolation per child with a shared zone for family settings. The system includes WidgetKit extensions for real-time progress visibility, App Intents for Siri integration, and Background Tasks framework for accurate point reconciliation. **StoreKit 2 powers the subscription system** with tiered pricing ($9.99-$13.98/month), 14-day free trial, and feature gating based on active subscription status. Server-side receipt validation via CloudKit Functions ensures fraud prevention while maintaining privacy. This architecture achieves PRD goals while maximizing Apple ecosystem strengths—native enforcement, zero backend maintenance, and privacy-first design with built-in COPPA compliance.
 
 ### Platform and Infrastructure Choice
 
@@ -42,6 +43,8 @@ This iOS-native application employs a **client-heavy architecture** with CloudKi
   - Shared zone for family settings (multi-parent collaboration)
   - Custom zone for real-time parent coordination
 - **Screen Time API + Authorization Center:** Usage monitoring with parent/child role management
+- **StoreKit 2:** In-app purchases, subscription management, 14-day free trial, receipt validation
+- **CloudKit Functions:** Server-side receipt validation with offline grace period support
 - **Background Tasks Framework:** BGAppRefreshTask for point reconciliation, BGProcessingTask for analytics
 - **WidgetKit + Live Activities:** Home screen widgets and real-time learning session tracking
 - **App Intents Framework:** Siri shortcuts for voice-first interactions
@@ -62,6 +65,7 @@ This iOS-native application employs a **client-heavy architecture** with CloudKi
 - `Packages/RewardCore/` - Business logic with modular reward strategies
 - `Packages/CloudKitService/` - CloudKit zone management and sync orchestration
 - `Packages/FamilyControlsKit/` - Family Controls & Screen Time API wrapper
+- `Packages/SubscriptionService/` - StoreKit 2 integration, feature gating, receipt validation
 - `Packages/DesignSystem/` - Shared UI components, SwiftUI views, themes
 - `Packages/SharedModels/` - Data models shared across app + widgets
 - `Packages/AppIntents/` - Siri shortcuts and App Intents definitions
@@ -81,6 +85,7 @@ graph TB
         FamilyControls[Family Controls Framework]
         FamilyShare[iCloud Family Sharing]
         ScreenTime[Screen Time API]
+        StoreKit[StoreKit 2]
         APNs[Apple Push Notifications]
     end
 
@@ -89,11 +94,14 @@ graph TB
         ChildZone2[(Child 2 Private Zone)]
         SharedZone[(Family Shared Zone)]
         ParentZone[(Parent Coordination Zone)]
+        ReceiptValidator[CloudKit Function: Receipt Validator]
     end
 
     App -->|Enforce Limits| FamilyControls
     App -->|Discover Family| FamilyShare
     App -->|Monitor Usage| ScreenTime
+    App -->|Purchase/Subscribe| StoreKit
+    App -->|Validate Receipt| ReceiptValidator
 
     App -->|Sync Child Data| ChildZone1
     App -->|Sync Child Data| ChildZone2
@@ -141,20 +149,23 @@ graph TB
 
 3. **CloudKit Zone Architecture** - Per-child private zones + shared family zone; better sync granularity and conflict resolution
 
-4. **Widget Extensions** - Real-time points/progress on home screen; Live Activities for active learning sessions (iOS 16+)
+4. **StoreKit 2 Subscription System** - Tiered pricing (1/2/3+ children), 14-day free trial, server-side receipt validation, feature gating by subscription tier
 
-5. **App Intents & Siri** - Voice commands: "Hey Siri, how many points do I have?" / "Redeem 100 points for game time"
+5. **Widget Extensions** - Real-time points/progress on home screen; Live Activities for active learning sessions (iOS 16+)
 
-6. **Background Tasks Framework** - Periodic point reconciliation every 15 minutes; nightly usage analysis; ensures accuracy
+6. **App Intents & Siri** - Voice commands: "Hey Siri, how many points do I have?" / "Redeem 100 points for game time"
 
-7. **Modular Reward System** - Strategy pattern supports future expansion: time rewards (MVP), in-app purchases, real-world rewards, charity donations
+7. **Background Tasks Framework** - Periodic point reconciliation every 15 minutes; nightly usage analysis; ensures accuracy
 
-8. **Privacy-First Telemetry** - OSLog for structured logging, MetricKit for performance monitoring; no third-party analytics needed
+8. **Modular Reward System** - Strategy pattern supports future expansion: time rewards (MVP), in-app purchases, real-world rewards, charity donations
+
+9. **Privacy-First Telemetry** - OSLog for structured logging, MetricKit for performance monitoring; no third-party analytics needed
 
 **Trade-offs Accepted:**
-- iOS 15.0 minimum (vs PRD's iOS 14) - **95%+ market coverage, unlocks critical frameworks**
+- iOS 15.0 minimum (vs PRD's original iOS 14) - **95%+ market coverage, unlocks critical frameworks**
 - Tighter Apple ecosystem coupling - **Aligned with your preference, maximizes platform strengths**
 - Family Controls learning curve - **Well-documented Apple framework, superior to custom implementation**
+- Apple 30% revenue share - **Industry standard, provides App Store distribution and payment processing**
 
 ---
 
@@ -192,6 +203,9 @@ graph TB
 | **Background Processing** | BackgroundTasks Framework | iOS 15.0+ | Point reconciliation | BGAppRefreshTask for periodic sync, BGProcessingTask for analytics |
 | **Conflict Resolution** | CloudKit Conflict Handlers | CKRecord system fields | Multi-parent sync | Vector clocks via CKRecord metadata, last-write-wins with merge strategies |
 | **Local Notifications** | UserNotifications Framework | iOS 15.0+ | Achievement alerts | Local notifications for points earned, goals reached |
+| **In-App Purchases** | StoreKit 2 | iOS 15.0+ | Subscription system | Modern async/await API, auto-renewable subscriptions, transaction verification |
+| **Receipt Validation** | CloudKit Functions | CloudKit | Server-side validation | Fraud prevention, offline grace period support, entitlement management |
+| **Feature Gating** | FeatureGateService | Swift | Access control | Subscription-based feature access, graceful degradation on expiration |
 | **Design Tokens** | Custom Swift Enums | - | Design system | Type-safe colors, spacing, typography in DesignSystem package |
 
 ## Data Models
@@ -455,6 +469,58 @@ interface RewardRedemption {
 
 ---
 
+### SubscriptionEntitlement
+
+**Purpose:** Tracks active subscription status and entitlements for feature gating
+
+**Key Attributes:**
+- `id`: UUID - Unique entitlement identifier
+- `familyID`: UUID - Reference to family
+- `subscriptionTier`: SubscriptionTier - Enum: `.oneChild`, `.twoChildren`, `.threeOrMore`
+- `receiptData`: String - App Store receipt for validation
+- `originalTransactionID`: String - StoreKit original transaction ID
+- `purchaseDate`: Date - When subscription started
+- `expirationDate`: Date - When subscription expires
+- `isActive`: Bool - Current subscription status
+- `isInTrial`: Bool - Whether in 14-day free trial
+- `autoRenewStatus`: Bool - Auto-renewal enabled
+- `lastValidatedAt`: Date - Last receipt validation timestamp
+
+#### TypeScript Interface
+```typescript
+enum SubscriptionTier {
+  oneChild = 'oneChild',       // $9.99/month
+  twoChildren = 'twoChildren', // $13.98/month
+  threeOrMore = 'threeOrMore'  // +$3.99/child/month
+}
+
+interface SubscriptionEntitlement {
+  id: UUID;
+  familyID: UUID;
+  subscriptionTier: SubscriptionTier;
+  receiptData: string;
+  originalTransactionID: string;
+  purchaseDate: Date;
+  expirationDate: Date;
+  isActive: boolean;
+  isInTrial: boolean;
+  autoRenewStatus: boolean;
+  lastValidatedAt: Date;
+  gracePeriodExpiresAt?: Date; // Offline grace period
+  metadata: {
+    productIdentifier: string;
+    environment: 'sandbox' | 'production';
+    validationAttempts: number;
+  };
+}
+```
+
+#### Relationships
+- Belongs to `Family` (one-to-one)
+- Validates against `ChildProfile` count for tier enforcement
+
+---
+
 ### FamilySettings
 
 **Purpose:** Configurable parameters for the reward system managed by parents
@@ -509,6 +575,8 @@ interface FamilySettings {
 5. **Offline Support:** All models include metadata for conflict resolution (CKRecord system fields)
 6. **COPPA Compliance:** `ChildProfile.birthDate` enforces age-appropriate features
 7. **Extensibility:** `RewardRedemption` designed to support future reward types via strategy pattern
+8. **Subscription Model:** `SubscriptionEntitlement` uses CloudKit Functions for server-side receipt validation
+9. **Grace Periods:** Offline subscription validation supports 7-day grace period for network issues
 
 ---
 
@@ -577,6 +645,27 @@ protocol ChildProfileRepository {
 
     /// Subscribe to child profile changes
     func subscribeToChildChanges(childID: UUID) -> AnyPublisher<ChildProfile, Error>
+}
+```
+
+#### SubscriptionRepository Protocol
+
+```swift
+protocol SubscriptionRepository {
+    /// Fetch active subscription entitlement
+    func fetchEntitlement(familyID: UUID) -> AnyPublisher<SubscriptionEntitlement?, Error>
+
+    /// Validate receipt via CloudKit Function
+    func validateReceipt(receiptData: String) -> AnyPublisher<SubscriptionEntitlement, Error>
+
+    /// Update entitlement after validation
+    func updateEntitlement(_ entitlement: SubscriptionEntitlement) -> AnyPublisher<SubscriptionEntitlement, Error>
+
+    /// Check if feature is allowed for current subscription
+    func checkFeatureAccess(feature: FeatureFlag, familyID: UUID) -> AnyPublisher<Bool, Error>
+
+    /// Subscribe to entitlement changes
+    func subscribeToEntitlementChanges(familyID: UUID) -> AnyPublisher<SubscriptionEntitlement, Error>
 }
 ```
 
@@ -689,6 +778,23 @@ let subscription = CKQuerySubscription(
 
 ---
 
+### SubscriptionService
+
+**Responsibility:** StoreKit 2 integration, subscription purchases, feature gating, receipt validation.
+
+**Key Interfaces:**
+- `SubscriptionManager` - Fetches products, handles purchases
+- `ReceiptValidator` - Server-side validation via CloudKit Functions
+- `FeatureGateService` - Subscription-based feature access control
+- `TrialManager` - 14-day trial eligibility and management
+- `EntitlementEngine` - Maps subscription tier to feature access
+
+**Dependencies:** StoreKit, CloudKit, SharedModels
+
+**Technology Stack:** StoreKit 2, CloudKit Functions, Combine, async/await
+
+---
+
 ### BackgroundTasksCoordinator
 
 **Responsibility:** Background point reconciliation and periodic sync.
@@ -697,9 +803,10 @@ let subscription = CKQuerySubscription(
 - `PointReconciliationTask` - Validates points every 15 min
 - `UsageAnalysisTask` - Nightly usage analysis
 - `SyncReconciliationTask` - Resolves offline conflicts
+- `SubscriptionValidationTask` - Hourly receipt validation
 - `TaskScheduler` - Registers background tasks
 
-**Dependencies:** BackgroundTasks, RewardEngineCore, CloudKitSyncEngine
+**Dependencies:** BackgroundTasks, RewardEngineCore, CloudKitSyncEngine, SubscriptionService
 
 **Technology Stack:** BGAppRefreshTask, BGProcessingTask, Combine, OSLog
 
@@ -764,9 +871,9 @@ let subscription = CKQuerySubscription(
 - Extension helpers
 - Constants
 
-**Dependencies:** Foundation, CloudKit
+**Dependencies:** Foundation, CloudKit, StoreKit
 
-**Technology Stack:** Pure Swift, Codable, CKRecord extensions
+**Technology Stack:** Pure Swift, Codable, CKRecord extensions, StoreKit 2 types
 
 ---
 
@@ -789,6 +896,9 @@ let subscription = CKQuerySubscription(
 | CloudKit | Data storage and sync | Native CloudKit SDK |
 | APNs | Push notifications | CloudKit subscriptions |
 | Family Sharing | Family discovery | FamilyActivityPicker |
+| StoreKit 2 | In-app purchases | `Product.products(for:)`, `Transaction.currentEntitlements` |
+| CloudKit Functions | Receipt validation | Custom CloudKit function (server-side) |
+| App Store Server API | Transaction info | StoreKit 2 Transaction verification |
 
 ---
 
@@ -835,7 +945,27 @@ sequenceDiagram
     RewardEngine->>Child: "You earned 10 points!"
 ```
 
-### Workflow 3: Multi-Parent Real-Time Sync
+### Workflow 3: Subscription Purchase & Feature Gating
+
+```mermaid
+sequenceDiagram
+    participant Parent
+    participant StoreKit
+    participant SubscriptionService
+    participant CloudKitFunction
+    participant CloudKit
+
+    Parent->>StoreKit: Initiate purchase (2-child plan)
+    StoreKit->>StoreKit: Process payment
+    StoreKit->>SubscriptionService: Transaction completed
+    SubscriptionService->>CloudKitFunction: Validate receipt
+    CloudKitFunction->>CloudKitFunction: Verify with App Store
+    CloudKitFunction->>CloudKit: Save entitlement
+    CloudKit->>SubscriptionService: Return entitlement
+    SubscriptionService->>Parent: Unlock features
+```
+
+### Workflow 4: Multi-Parent Real-Time Sync
 
 ```mermaid
 sequenceDiagram
@@ -952,6 +1082,32 @@ Indexes:
   - SORTABLE: timestamp (desc)
 ```
 
+#### Record Type: SubscriptionEntitlement
+```swift
+// Zone: CKRecordZone.default() (shared)
+RecordType: "SubscriptionEntitlement"
+Fields:
+  - id: String (UUID)
+  - familyID: String
+  - subscriptionTier: String (enum)
+  - receiptData: String
+  - originalTransactionID: String
+  - purchaseDate: Date/Time
+  - expirationDate: Date/Time
+  - isActive: Int64 (boolean)
+  - isInTrial: Int64 (boolean)
+  - autoRenewStatus: Int64 (boolean)
+  - lastValidatedAt: Date/Time
+  - gracePeriodExpiresAt: Date/Time (optional)
+  - productIdentifier: String
+  - environment: String
+
+Indexes:
+  - QUERYABLE: familyID
+  - QUERYABLE: expirationDate
+  - SORTABLE: lastValidatedAt (desc)
+```
+
 ---
 
 ### CoreData Schema (Local Cache)
@@ -1016,6 +1172,13 @@ ScreenTimeRewards/
 │   ├── ChildDashboard/
 │   ├── AppCategorization/
 │   ├── RewardRedemption/
+│   ├── Subscription/
+│   │   ├── Views/
+│   │   │   ├── PaywallView.swift
+│   │   │   ├── PlanSelectionView.swift
+│   │   │   └── SubscriptionManagementView.swift
+│   │   └── ViewModels/
+│   │       └── SubscriptionViewModel.swift
 │   └── Settings/
 └── Common/
     ├── Extensions/
@@ -1224,6 +1387,7 @@ ScreenTimeRewards/
 │   ├── RewardCore/
 │   ├── CloudKitService/
 │   ├── FamilyControlsKit/
+│   ├── SubscriptionService/
 │   ├── DesignSystem/
 │   ├── SharedModels/
 │   └── AppIntents/
@@ -1343,6 +1507,8 @@ jobs:
 - Memory: <100MB typical
 - Battery: <5% daily drain
 - Storage: <100MB installed
+- Subscription validation: <1 second latency
+- Payment processing: >95% success rate
 
 **Strategies:**
 - Indexed CloudKit queries
@@ -1401,6 +1567,10 @@ func testParentCanCategorizeApp() {
 - Battery drain
 - Crash-free sessions %
 - Points earned per child per day
+- Trial-to-paid conversion rate
+- Monthly churn rate
+- Payment failure rate
+- Subscription validation latency
 
 ```swift
 import OSLog
@@ -1533,18 +1703,21 @@ class DashboardViewModel: ObservableObject {
 **Medium Risks:**
 1. iOS 15.0+ requirement (5% market exclusion)
 2. CloudKit vendor lock-in
+3. Receipt validation complexity (mitigated with CloudKit Functions)
 
 **Low Risks:**
-3. Background task reliability
-4. Family Controls complexity
-5. Widget data sharing setup
+4. Background task reliability
+5. Family Controls complexity
+6. Widget data sharing setup
+7. StoreKit 2 learning curve (well-documented by Apple)
+8. App Store subscription review process
 
 ### Recommendations
 
 **Must-Fix:** None - Architecture is development-ready ✅
 
 **Should-Fix:**
-1. Update PRD to align with iOS 15.0 baseline
+1. ~~Update PRD to align with iOS 15.0 baseline~~ ✅ Completed (PRD v1.2)
 2. Document theoretical CloudKit migration path
 
 **Nice-to-Have:**
@@ -1552,19 +1725,64 @@ class DashboardViewModel: ObservableObject {
 2. Document non-iCloud user fallback
 3. Include performance benchmarks
 
+### Epic 7 Integration Summary
+
+**Monetization Strategy (PRD v1.2):**
+
+The architecture now includes comprehensive StoreKit 2 subscription infrastructure added in PRD v1.2:
+
+**Subscription Tiers:**
+- 1 Child Plan: $9.99/month or $89.99/year
+- 2 Child Plan: $13.98/month or $125.99/year
+- 3+ Child Plan: +$3.99/month or +$25/year per additional child
+- 14-day free trial (no payment method required)
+
+**New Architecture Components:**
+1. **SubscriptionService Package** - StoreKit 2 integration, product fetching, purchase handling
+2. **FeatureGateService** - Subscription-based feature access control
+3. **CloudKit Function: validateSubscriptionReceipt** - Server-side receipt validation
+4. **SubscriptionEntitlement Data Model** - Tracks active subscriptions and entitlements
+5. **PaywallView & Subscription Management UI** - Conversion-optimized purchase flows
+
+**Technical Implementation:**
+- StoreKit 2 async/await API for modern subscription handling
+- CloudKit Functions for fraud-resistant receipt validation
+- Offline grace period support (7 days) for network issues
+- Feature gating enforces tier-based access limits
+- Background task for hourly subscription validation
+- Apple Family Sharing compatibility
+
+**Success Metrics:**
+- Trial-to-paid conversion >30%
+- Monthly churn rate <5%
+- Average LTV >$150 per family
+- Payment failure rate <2%
+- Receipt validation latency <1 second
+
+**App Store Compliance:**
+- Guideline 3.1 (In-App Purchase) fully addressed
+- Clear pricing and terms before purchase
+- Subscription management via iOS Settings
+- Restore purchases functionality
+- Privacy policy updated for payment data handling
+
+---
+
 ### Final Verdict
 
 **✅ ARCHITECTURE APPROVED FOR DEVELOPMENT**
 
-This architecture demonstrates exceptional quality with zero critical issues, strong PRD alignment, and excellent AI agent implementation suitability. The serverless CloudKit approach provides enterprise-grade reliability while eliminating backend complexity.
+This architecture demonstrates exceptional quality with zero critical issues, strong PRD alignment, and excellent AI agent implementation suitability. The serverless CloudKit approach provides enterprise-grade reliability while eliminating backend complexity. Epic 7 monetization infrastructure is production-ready with industry-standard patterns.
 
 **Next Steps:**
-1. Update PRD to iOS 15.0 minimum
-2. Begin development with SharedModels package
-3. Proceed with confidence - production-ready architecture
+1. ~~Update PRD to iOS 15.0 minimum~~ ✅ Completed (PRD v1.2)
+2. Begin development with SharedModels + SubscriptionService packages
+3. Set up App Store Connect subscription products (Story 7.1)
+4. Proceed with confidence - production-ready architecture
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** 2025-09-23
-**Status:** ✅ Approved for Development
+**Document Version:** 1.1
+**Last Updated:** 2025-09-24
+**Status:** ✅ Approved for Development (with Epic 7 Monetization)
+**PRD Version:** 1.2 (includes Payment & Subscription Infrastructure)
