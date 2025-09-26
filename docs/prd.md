@@ -193,7 +193,7 @@ Acceptance Criteria:
 5. Basic usage event detection is functional (app launch/close)
 6. Authorization flow is tested on physical device (Simulator limitations noted)
 
-Story 1.3: As a developer, I want to set up CloudKit schema, repository protocols, and local cache, so that user data can be synchronized across devices and backed up securely.
+Story 1.3: As a developer, I want to set up CloudKit schema, repository protocols, and local cache, so that user data can be synchronized across devices and backed up securely. **[CREATED: docs/stories/1.3.cloudkit-setup.md]**
 
 Acceptance Criteria:
 1. CloudKit container is configured in Xcode project
