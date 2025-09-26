@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystemTests.build/master.swiftdeps"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Tests/DesignSystemTests/DesignSystemTests.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystemTests.build/DesignSystemTests.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystemTests.build/DesignSystemTests.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystemTests.build/DesignSystemTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystemTests.build/DesignSystemTests.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystemTests.build/DesignSystemTests.dia"
+  }
+}

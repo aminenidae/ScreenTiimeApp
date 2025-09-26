@@ -1,0 +1,75 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/master.swiftdeps"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Components/DSButton.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSButton.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSButton.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSButton~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSButton.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSButton.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Components/DSCard.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSCard.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSCard.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSCard~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSCard.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSCard.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Components/Gamification/DSPointsDisplay.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSPointsDisplay.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSPointsDisplay.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSPointsDisplay~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSPointsDisplay.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSPointsDisplay.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Components/Gamification/DSProgressRing.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSProgressRing.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSProgressRing.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSProgressRing~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSProgressRing.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DSProgressRing.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/DesignSystem.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DesignSystem.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DesignSystem.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DesignSystem~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DesignSystem.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/DesignSystem.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Icons/IconSystem.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/IconSystem.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/IconSystem.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/IconSystem~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/IconSystem.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/IconSystem.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Modifiers/ViewModifiers.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ViewModifiers.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ViewModifiers.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ViewModifiers~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ViewModifiers.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ViewModifiers.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Tokens/ColorTokens.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ColorTokens.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ColorTokens.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ColorTokens~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ColorTokens.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/ColorTokens.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Tokens/SpacingTokens.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/SpacingTokens.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/SpacingTokens.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/SpacingTokens~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/SpacingTokens.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/SpacingTokens.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/Sources/DesignSystem/Tokens/TypographyTokens.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/TypographyTokens.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/TypographyTokens.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/TypographyTokens~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/TypographyTokens.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/DesignSystem/.build/x86_64-apple-macosx/debug/DesignSystem.build/TypographyTokens.dia"
+  }
+}

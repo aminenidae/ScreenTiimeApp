@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.build/master.swiftdeps"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.build/runner.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKitPackageTests.build/runner.dia"
+  }
+}
