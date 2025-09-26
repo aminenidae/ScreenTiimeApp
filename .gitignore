@@ -19,16 +19,22 @@ ModuleCache/
 *.tmp
 .DS_Store
 *.plist.lock
+<<<<<<< HEAD
 *.plist.lockfile
+=======
+>>>>>>> 8f0ab4aada3435c83eb711f05a28e74b0aec5977
 
 # Swift Package Manager
 Packages/
 .build/
 .swiftpm/
+<<<<<<< HEAD
 *.pcm
 *.swiftinterface
 *.swiftmodule
 index/
+=======
+>>>>>>> 8f0ab4aada3435c83eb711f05a28e74b0aec5977
 
 # Xcode compilation cache
 CompilationCache.noindex/
@@ -37,6 +43,7 @@ SDKStatCaches.noindex/
 
 # OS generated files
 Thumbs.db
+<<<<<<< HEAD
 
 # User-specific files
 *.xcuserstate
@@ -50,3 +57,5 @@ UserInterfaceState.xcuserstate
 *.a
 *.dylib
 *.so
+=======
+>>>>>>> 8f0ab4aada3435c83eb711f05a28e74b0aec5977

@@ -1,0 +1,54 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/master.swiftdeps"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/DeviceActivityEventHandler.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityEventHandler.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityEventHandler.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityEventHandler~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityEventHandler.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityEventHandler.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/DeviceActivityService.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityService.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityService.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityService~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityService.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/DeviceActivityService.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/FamilyControlsAuthorizationService.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsAuthorizationService.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsAuthorizationService.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsAuthorizationService~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsAuthorizationService.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsAuthorizationService.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/FamilyControlsConfiguration.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsConfiguration.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsConfiguration.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsConfiguration~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsConfiguration.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsConfiguration.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/FamilyControlsDebugTools.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsDebugTools.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsDebugTools.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsDebugTools~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsDebugTools.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsDebugTools.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/FamilyControlsKit.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsKit.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsKit.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsKit~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsKit.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsKit.dia"
+  },
+  "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/Sources/FamilyControlsKit/FamilyControlsLogger.swift": {
+    "dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsLogger.d",
+    "object": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsLogger.swift.o",
+    "swiftmodule": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsLogger~partial.swiftmodule",
+    "swift-dependencies": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsLogger.swiftdeps",
+    "diagnostics": "/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/ScreenTimeRewards/Packages/FamilyControlsKit/.build/x86_64-apple-macosx/debug/FamilyControlsKit.build/FamilyControlsLogger.dia"
+  }
+}
