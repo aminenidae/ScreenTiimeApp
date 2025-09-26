@@ -11,20 +11,17 @@ let package = Package(
     products: [
         .library(
             name: "FamilyControlsKit",
-            targets: ["FamilyControlsKit"]
-        ),
+            targets: ["FamilyControlsKit"])
     ],
     dependencies: [
-        .package(path: "../SharedModels")
+        .package(name: "SharedModels", path: "../SharedModels")
     ],
     targets: [
         .target(
             name: "FamilyControlsKit",
-            dependencies: ["SharedModels"]
-        ),
+            dependencies: ["SharedModels"]),
         .testTarget(
             name: "FamilyControlsKitTests",
-            dependencies: ["FamilyControlsKit"]
-        ),
+            dependencies: ["FamilyControlsKit"])
     ]
 )

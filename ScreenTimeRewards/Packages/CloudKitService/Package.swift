@@ -11,20 +11,17 @@ let package = Package(
     products: [
         .library(
             name: "CloudKitService",
-            targets: ["CloudKitService"]
-        ),
+            targets: ["CloudKitService"])
     ],
     dependencies: [
-        .package(path: "../SharedModels")
+        .package(name: "SharedModels", path: "../SharedModels")
     ],
     targets: [
         .target(
             name: "CloudKitService",
-            dependencies: ["SharedModels"]
-        ),
+            dependencies: ["SharedModels"]),
         .testTarget(
             name: "CloudKitServiceTests",
-            dependencies: ["CloudKitService"]
-        ),
+            dependencies: ["CloudKitService"])
     ]
 )

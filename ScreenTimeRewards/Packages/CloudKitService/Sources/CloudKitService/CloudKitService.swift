@@ -7,28 +7,28 @@ import SharedModels
 /// Protocol for child profile data operations
 public protocol ChildProfileRepository {
     func createChild(_ child: ChildProfile) async throws -> ChildProfile
-    func fetchChild(id: UUID) async throws -> ChildProfile?
-    func fetchChildren(for parentID: UUID) async throws -> [ChildProfile]
+    func fetchChild(id: String) async throws -> ChildProfile?
+    func fetchChildren(for parentID: String) async throws -> [ChildProfile]
     func updateChild(_ child: ChildProfile) async throws -> ChildProfile
-    func deleteChild(id: UUID) async throws
+    func deleteChild(id: String) async throws
 }
 
 /// Protocol for reward data operations
 public protocol RewardRepository {
     func createReward(_ reward: Reward) async throws -> Reward
-    func fetchReward(id: UUID) async throws -> Reward?
-    func fetchRewards(for parentID: UUID) async throws -> [Reward]
+    func fetchReward(id: String) async throws -> Reward?
+    func fetchRewards(for parentID: String) async throws -> [Reward]
     func updateReward(_ reward: Reward) async throws -> Reward
-    func deleteReward(id: UUID) async throws
+    func deleteReward(id: String) async throws
 }
 
 /// Protocol for screen time session data operations
 public protocol ScreenTimeRepository {
     func createSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession
-    func fetchSession(id: UUID) async throws -> ScreenTimeSession?
-    func fetchSessions(for childID: UUID, dateRange: DateRange?) async throws -> [ScreenTimeSession]
+    func fetchSession(id: String) async throws -> ScreenTimeSession?
+    func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [ScreenTimeSession]
     func updateSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession
-    func deleteSession(id: UUID) async throws
+    func deleteSession(id: String) async throws
 }
 
 // MARK: - CloudKit Service Implementation (Placeholder)
@@ -111,12 +111,12 @@ public class CloudKitChildProfileRepository: ChildProfileRepository {
         return child
     }
 
-    public func fetchChild(id: UUID) async throws -> ChildProfile? {
+    public func fetchChild(id: String) async throws -> ChildProfile? {
         // TODO: Fetch CKRecord and convert to ChildProfile
         return nil
     }
 
-    public func fetchChildren(for parentID: UUID) async throws -> [ChildProfile] {
+    public func fetchChildren(for parentID: String) async throws -> [ChildProfile] {
         // TODO: Query CKRecords for children of parent
         return []
     }
@@ -126,7 +126,7 @@ public class CloudKitChildProfileRepository: ChildProfileRepository {
         return child
     }
 
-    public func deleteChild(id: UUID) async throws {
+    public func deleteChild(id: String) async throws {
         // TODO: Delete CKRecord
     }
 }
@@ -144,12 +144,12 @@ public class CloudKitRewardRepository: RewardRepository {
         return reward
     }
 
-    public func fetchReward(id: UUID) async throws -> Reward? {
+    public func fetchReward(id: String) async throws -> Reward? {
         // TODO: Fetch CKRecord and convert to Reward
         return nil
     }
 
-    public func fetchRewards(for parentID: UUID) async throws -> [Reward] {
+    public func fetchRewards(for parentID: String) async throws -> [Reward] {
         // TODO: Query CKRecords for rewards by parent
         return []
     }
@@ -159,7 +159,7 @@ public class CloudKitRewardRepository: RewardRepository {
         return reward
     }
 
-    public func deleteReward(id: UUID) async throws {
+    public func deleteReward(id: String) async throws {
         // TODO: Delete CKRecord
     }
 }
@@ -177,12 +177,12 @@ public class CloudKitScreenTimeRepository: ScreenTimeRepository {
         return session
     }
 
-    public func fetchSession(id: UUID) async throws -> ScreenTimeSession? {
+    public func fetchSession(id: String) async throws -> ScreenTimeSession? {
         // TODO: Fetch CKRecord and convert to ScreenTimeSession
         return nil
     }
 
-    public func fetchSessions(for childID: UUID, dateRange: DateRange?) async throws -> [ScreenTimeSession] {
+    public func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [ScreenTimeSession] {
         // TODO: Query CKRecords for sessions with date filtering
         return []
     }
@@ -192,7 +192,7 @@ public class CloudKitScreenTimeRepository: ScreenTimeRepository {
         return session
     }
 
-    public func deleteSession(id: UUID) async throws {
+    public func deleteSession(id: String) async throws {
         // TODO: Delete CKRecord
     }
 }

@@ -1,34 +1,40 @@
 import Foundation
+#if canImport(FamilyControls)
 import FamilyControls
+#endif
 import OSLog
 
 // MARK: - Authorization Service Protocol
 
 /// Protocol for Family Controls authorization operations
-@available(iOS 15.0, macOS 11.0, *)
+@available(iOS 15.0, *)
 public protocol FamilyControlsAuthorizationServiceProtocol {
     /// Current authorization status
+    @available(iOS 15.0, *)
     var authorizationStatus: AuthorizationStatus { get }
 
     /// Requests authorization for Family Controls
     /// - Returns: Authorization status after request
+    @available(iOS 15.0, *)
     func requestAuthorization() async throws -> AuthorizationStatus
 
     /// Checks if the current user is a parent
     /// - Returns: True if user has parent privileges
+    @available(iOS 15.0, *)
     func isParent() -> Bool
 
     /// Checks if the current user is a child
     /// - Returns: True if user is in child role
+    @available(iOS 15.0, *)
     func isChild() -> Bool
 }
 
 // MARK: - Authorization Service Implementation
 
 /// Service for managing Family Controls authorization
-@available(iOS 15.0, macOS 11.0, *)
+@available(iOS 15.0, *)
 public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServiceProtocol {
-
+#if canImport(FamilyControls)
     // MARK: - Properties
 
     private let authorizationCenter: AuthorizationCenter
@@ -41,7 +47,7 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
 
     // MARK: - Initialization
 
-    public init(authorizationCenter: AuthorizationCenter = .shared, cacheInterval: TimeInterval = FamilyControlsConfiguration.Authorization.defaultCacheInterval) {
+    public init(authorizationCenter: AuthorizationCenter = .shared, cacheInterval: TimeInterval = 300) { // Default 5 minutes
         self.authorizationCenter = authorizationCenter
         self.statusCacheInterval = cacheInterval
     }
@@ -172,11 +178,76 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
             return "Please check your Family Controls settings in the Settings app."
         }
     }
+#else
+    // MARK: - Properties
+    private let logger = Logger(subsystem: "com.screentimerewards.familycontrolskit", category: "authorization")
+
+    // Authorization status caching
+    private var lastStatusCheck: Date?
+    private let statusCacheInterval: TimeInterval
+
+    // MARK: - Initialization
+
+    public init(authorizationCenter: Any? = nil, cacheInterval: TimeInterval = 300) { // Default 5 minutes
+        self.statusCacheInterval = cacheInterval
+    }
+
+    // MARK: - Protocol Implementation
+
+    public var authorizationStatus: Any {
+        return "unavailable"
+    }
+
+    public func requestAuthorization() async throws -> Any {
+        throw FamilyControlsAuthorizationError.unavailable
+    }
+
+    public func isParent() -> Bool {
+        return false
+    }
+
+    public func isChild() -> Bool {
+        return false
+    }
+
+    // MARK: - Additional Authorization Methods
+
+    /// Clears cached authorization status to force fresh check
+    public func clearAuthorizationCache() {
+        lastStatusCheck = nil
+        logger.debug("Authorization status cache cleared")
+    }
+
+    /// Checks if authorization is required
+    public func isAuthorizationRequired() -> Bool {
+        return false
+    }
+
+    /// Checks if authorization was explicitly denied by user
+    public func wasAuthorizationDenied() -> Bool {
+        return false
+    }
+
+    /// Checks if app is currently authorized to use Family Controls
+    public func isAuthorized() -> Bool {
+        return false
+    }
+
+    /// Provides user-friendly status description
+    public func getAuthorizationStatusDescription() -> String {
+        return "Family Controls not available on this platform"
+    }
+
+    /// Provides guidance for user on how to resolve authorization issues
+    public func getAuthorizationGuidance() -> String {
+        return "Family Controls is only available on iOS devices"
+    }
+#endif
 }
 
 // MARK: - Error Types
 
-@available(iOS 15.0, macOS 11.0, *)
+@available(iOS 15.0, *)
 public enum FamilyControlsAuthorizationError: Error, LocalizedError {
     case authorizationDenied
     case requestFailed
@@ -213,9 +284,10 @@ public enum FamilyControlsAuthorizationError: Error, LocalizedError {
     }
 }
 
+#if canImport(FamilyControls)
 // MARK: - Authorization Status Extensions
 
-@available(iOS 15.0, macOS 11.0, *)
+@available(iOS 15.0, *)
 extension AuthorizationStatus {
     /// Human-readable description of the authorization status
     public var description: String {
@@ -236,3 +308,4 @@ extension AuthorizationStatus {
         return self == .approved
     }
 }
+#endif

@@ -11,20 +11,17 @@ let package = Package(
     products: [
         .library(
             name: "RewardCore",
-            targets: ["RewardCore"]
-        ),
+            targets: ["RewardCore"])
     ],
     dependencies: [
-        .package(path: "../SharedModels")
+        .package(name: "SharedModels", path: "../SharedModels")
     ],
     targets: [
         .target(
             name: "RewardCore",
-            dependencies: ["SharedModels"]
-        ),
+            dependencies: ["SharedModels"]),
         .testTarget(
             name: "RewardCoreTests",
-            dependencies: ["RewardCore"]
-        ),
+            dependencies: ["RewardCore"])
     ]
 )

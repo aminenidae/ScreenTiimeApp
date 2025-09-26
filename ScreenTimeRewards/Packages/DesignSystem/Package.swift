@@ -11,20 +11,17 @@ let package = Package(
     products: [
         .library(
             name: "DesignSystem",
-            targets: ["DesignSystem"]
-        ),
+            targets: ["DesignSystem"])
     ],
     dependencies: [
-        // No external dependencies - using native SwiftUI
+        .package(name: "SharedModels", path: "../SharedModels")
     ],
     targets: [
         .target(
             name: "DesignSystem",
-            dependencies: []
-        ),
+            dependencies: ["SharedModels"]),
         .testTarget(
             name: "DesignSystemTests",
-            dependencies: ["DesignSystem"]
-        ),
+            dependencies: ["DesignSystem"])
     ]
 )

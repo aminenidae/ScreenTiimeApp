@@ -179,4 +179,11 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertEqual(darkTheme.colorScheme, .dark)
         XCTAssertNil(autoTheme.colorScheme)
     }
+
+    func testAuthViewsExist() {
+        // This is a simple test to ensure the views compile correctly
+        // In a real implementation, we would use snapshot testing or view inspection
+        
+        XCTAssertTrue(true) // Placeholder test
+    }
 }

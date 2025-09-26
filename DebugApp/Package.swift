@@ -4,21 +4,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "SharedModels",
+    name: "DebugApp",
     platforms: [
         .iOS(.v15)
     ],
     products: [
         .library(
-            name: "SharedModels",
-            targets: ["SharedModels"])
+            name: "DebugApp",
+            targets: ["DebugApp"])
     ],
     targets: [
         .target(
-            name: "SharedModels",
+            name: "DebugApp",
             dependencies: []),
         .testTarget(
-            name: "SharedModelsTests",
-            dependencies: ["SharedModels"])
+            name: "DebugAppTests",
+            dependencies: ["DebugApp"])
     ]
 )
