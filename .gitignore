@@ -1,0 +1,34 @@
+# Xcode
+*.xccheckout
+*.xcscmblueprint
+*.xcscheme
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+build/
+Build/
+DerivedData/
+ModuleCache/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+**/*~.nib
+*.swp
+*.tmp
+.DS_Store
+*.plist.lock
+
+# Swift Package Manager
+Packages/
+.build/
+.swiftpm/
+
+# Xcode compilation cache
+CompilationCache.noindex/
+ModuleCache.noindex/
+SDKStatCaches.noindex/
+
+# OS generated files
+Thumbs.db
