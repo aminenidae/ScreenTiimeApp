@@ -1,6 +1,7 @@
 import Foundation
 import SharedModels
 
+@available(iOS 15.0, macOS 10.15, *)
 public class PointTransactionRepository: SharedModels.PointTransactionRepository {
     
     public init() {}

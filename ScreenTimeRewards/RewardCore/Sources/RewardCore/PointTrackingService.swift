@@ -9,15 +9,15 @@ import Combine
 @available(iOS 15.0, macOS 12.0, *)
 public class PointTrackingService: NSObject {
     private let calculationEngine: PointCalculationEngine
-    private let usageRepository: CloudKitService.UsageSessionRepository
-    private let pointRepository: CloudKitService.PointTransactionRepository
+    private let usageRepository: SharedModels.UsageSessionRepository
+    private let pointRepository: SharedModels.PointTransactionRepository
     private var monitoringToken: NSObjectProtocol?
     private var cancellables = Set<AnyCancellable>()
     
     public init(
         calculationEngine: PointCalculationEngine = PointCalculationEngine(),
-        usageRepository: CloudKitService.UsageSessionRepository = CloudKitService.UsageSessionRepository(),
-        pointRepository: CloudKitService.PointTransactionRepository = CloudKitService.PointTransactionRepository()
+        usageRepository: SharedModels.UsageSessionRepository = CloudKitService.shared,
+        pointRepository: SharedModels.PointTransactionRepository = CloudKitService.shared
     ) {
         self.calculationEngine = calculationEngine
         self.usageRepository = usageRepository
@@ -52,7 +52,9 @@ public class PointTrackingService: NSObject {
         let points = calculationEngine.calculatePoints(for: session)
         
         // Save the usage session
-        usageRepository.save(session: session)
+        Task {
+            _ = try await usageRepository.createSession(session)
+        }
         
         // Create and save point transaction
         let transaction = PointTransaction(
@@ -63,7 +65,9 @@ public class PointTrackingService: NSObject {
             timestamp: Date()
         )
         
-        pointRepository.save(transaction: transaction)
+        Task {
+            _ = try await pointRepository.createTransaction(transaction)
+        }
     }
     
     /// Handles app switching events

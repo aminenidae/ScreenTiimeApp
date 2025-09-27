@@ -255,6 +255,39 @@ public struct PointTransaction: Codable, Identifiable {
     }
 }
 
+// MARK: - Point-to-Time Redemption Model (for app screen time rewards)
+public struct PointToTimeRedemption: Codable, Identifiable {
+    public let id: String
+    public let childProfileID: String
+    public let appCategorizationID: String
+    public let pointsSpent: Int
+    public let timeGrantedMinutes: Int
+    public let conversionRate: Double // points per minute
+    public let redeemedAt: Date
+    public let expiresAt: Date
+    public var timeUsedMinutes: Int
+    public let status: RedemptionStatus
+
+    public init(id: String, childProfileID: String, appCategorizationID: String, pointsSpent: Int, timeGrantedMinutes: Int, conversionRate: Double, redeemedAt: Date, expiresAt: Date, timeUsedMinutes: Int = 0, status: RedemptionStatus = .active) {
+        self.id = id
+        self.childProfileID = childProfileID
+        self.appCategorizationID = appCategorizationID
+        self.pointsSpent = pointsSpent
+        self.timeGrantedMinutes = timeGrantedMinutes
+        self.conversionRate = conversionRate
+        self.redeemedAt = redeemedAt
+        self.expiresAt = expiresAt
+        self.timeUsedMinutes = timeUsedMinutes
+        self.status = status
+    }
+}
+
+public enum RedemptionStatus: String, Codable, CaseIterable {
+    case active = "active"
+    case expired = "expired"
+    case used = "used"
+}
+
 public struct RewardRedemption: Codable, Identifiable {
     public let id: String
     public let childProfileID: String
@@ -262,7 +295,7 @@ public struct RewardRedemption: Codable, Identifiable {
     public let pointsSpent: Int
     public let timestamp: Date
     public let transactionID: String
-    
+
     public init(id: String, childProfileID: String, rewardID: String, pointsSpent: Int, timestamp: Date, transactionID: String) {
         self.id = id
         self.childProfileID = childProfileID
@@ -311,6 +344,7 @@ public struct SubscriptionEntitlement: Codable, Identifiable {
 
 // MARK: - Repository Protocols
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol FamilyRepository {
     func createFamily(_ family: Family) async throws -> Family
     func fetchFamily(id: String) async throws -> Family?
@@ -319,6 +353,7 @@ public protocol FamilyRepository {
     func fetchFamilies(for userID: String) async throws -> [Family]
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol ChildProfileRepository {
     func createChild(_ child: ChildProfile) async throws -> ChildProfile
     func fetchChild(id: String) async throws -> ChildProfile?
@@ -327,6 +362,7 @@ public protocol ChildProfileRepository {
     func deleteChild(id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol AppCategorizationRepository {
     func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization
     func fetchAppCategorization(id: String) async throws -> AppCategorization?
@@ -335,6 +371,7 @@ public protocol AppCategorizationRepository {
     func deleteAppCategorization(id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol UsageSessionRepository {
     func createSession(_ session: UsageSession) async throws -> UsageSession
     func fetchSession(id: String) async throws -> UsageSession?
@@ -343,6 +380,7 @@ public protocol UsageSessionRepository {
     func deleteSession(id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol PointTransactionRepository {
     func createTransaction(_ transaction: PointTransaction) async throws -> PointTransaction
     func fetchTransaction(id: String) async throws -> PointTransaction?
@@ -351,6 +389,7 @@ public protocol PointTransactionRepository {
     func deleteTransaction(id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol RewardRedemptionRepository {
     func createRedemption(_ redemption: RewardRedemption) async throws -> RewardRedemption
     func fetchRedemption(id: String) async throws -> RewardRedemption?
@@ -359,6 +398,17 @@ public protocol RewardRedemptionRepository {
     func deleteRedemption(id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
+public protocol PointToTimeRedemptionRepository {
+    func createPointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption
+    func fetchPointToTimeRedemption(id: String) async throws -> PointToTimeRedemption?
+    func fetchPointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption]
+    func fetchActivePointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption]
+    func updatePointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption
+    func deletePointToTimeRedemption(id: String) async throws
+}
+
+@available(iOS 15.0, macOS 10.15, *)
 public protocol FamilySettingsRepository {
     func createSettings(_ settings: FamilySettings) async throws -> FamilySettings
     func fetchSettings(for familyID: String) async throws -> FamilySettings?
@@ -366,6 +416,7 @@ public protocol FamilySettingsRepository {
     func deleteSettings(id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol SubscriptionEntitlementRepository {
     func createEntitlement(_ entitlement: SubscriptionEntitlement) async throws -> SubscriptionEntitlement
     func fetchEntitlement(id: String) async throws -> SubscriptionEntitlement?

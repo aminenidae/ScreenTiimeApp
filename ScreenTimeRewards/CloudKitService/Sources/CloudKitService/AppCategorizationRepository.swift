@@ -1,12 +1,14 @@
 import Foundation
 import SharedModels
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol AppCategorizationRepositoryProtocol {
     func saveCategorization(_ categorization: AppCategorization) async throws
     func fetchCategorizations(for childProfileID: String) async throws -> [AppCategorization]
     func deleteCategorization(with id: String) async throws
 }
 
+@available(iOS 15.0, macOS 10.15, *)
 public class AppCategorizationRepository: AppCategorizationRepositoryProtocol {
     
     public init() {}
