@@ -1,0 +1,31 @@
+{
+  "deviceType": "IPHONE_65",
+  "language": "en-US",
+  "screenshots": [
+    {
+      "fileName": "1-ParentDashboard.png",
+      "description": "Parent dashboard showing family screen time overview",
+      "sortOrder": 1
+    },
+    {
+      "fileName": "2-ChildDashboard.png",
+      "description": "Child dashboard with points and achievements",
+      "sortOrder": 2
+    },
+    {
+      "fileName": "3-RewardRedemption.png",
+      "description": "Reward redemption interface",
+      "sortOrder": 3
+    },
+    {
+      "fileName": "4-AppCategorization.png",
+      "description": "App categorization settings",
+      "sortOrder": 4
+    },
+    {
+      "fileName": "5-Settings.png",
+      "description": "App settings and family management",
+      "sortOrder": 5
+    }
+  ]
+}

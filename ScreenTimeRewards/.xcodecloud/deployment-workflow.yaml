@@ -1,0 +1,46 @@
+name: TestFlight Deployment
+description: Deploy builds to TestFlight for internal testing
+
+# Trigger configuration
+triggers:
+  - push:
+      branches:
+        - main
+
+# Build environment
+environment:
+  platform: iOS
+  version: 15.0
+  xcode: 15.0
+
+# Pre-build actions
+pre:
+  - script:
+      path: Scripts/version-management.sh
+      name: Version Management
+  - script:
+      path: Scripts/environment-setup.sh
+      name: Environment Setup
+  - script:
+      path: Scripts/certificates-setup.sh
+      name: Certificates Setup
+
+# Build actions
+actions:
+  - build:
+      name: Build for TestFlight
+      scheme: ScreenTimeRewards-Package
+      destination: Generic iOS Device
+      actions:
+        - archive
+      configuration: Release
+      scripts:
+        - path: Scripts/deploy-testflight.sh
+          name: Deploy TestFlight Script
+
+# Distribution
+distribution:
+  - testflight:
+      name: Internal Testing
+      groups:
+        - internal-testers

@@ -16,7 +16,9 @@ let package = Package(
         .library(name: "FamilyControlsKit", targets: ["FamilyControlsKit"])
     ],
     dependencies: [
-        // No external dependencies in initial setup
+        // Code quality tools for development
+        .package(url: "https://github.com/realm/SwiftLint", from: "0.50.0"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.0")
     ],
     targets: [
         // SharedModels
@@ -58,7 +60,7 @@ let package = Package(
         // CloudKitService
         .target(
             name: "CloudKitService",
-            dependencies: ["SharedModels"],
+            dependencies: ["SharedModels", "FamilyControlsKit"],
             path: "Packages/CloudKitService/Sources/CloudKitService"
         ),
         .testTarget(

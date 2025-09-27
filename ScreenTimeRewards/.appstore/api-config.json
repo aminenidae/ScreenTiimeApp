@@ -1,0 +1,18 @@
+{
+  "appStoreConnect": {
+    "issuerId": "YOUR_ISSUER_ID",
+    "keyId": "YOUR_KEY_ID",
+    "privateKeyPath": ".appstore/private-key.p8",
+    "apiKey": "YOUR_API_KEY"
+  },
+  "automatedActions": {
+    "createAppRecord": true,
+    "uploadScreenshots": true,
+    "updateMetadata": true,
+    "submitForReview": false
+  },
+  "notifications": {
+    "email": "app-store-notifications@screentimerewards.com",
+    "slackWebhook": "YOUR_SLACK_WEBHOOK_URL"
+  }
+}

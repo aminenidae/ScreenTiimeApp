@@ -5,33 +5,36 @@
 **Start Date:** Ready to begin
 **Product Owner:** Sarah
 **PRD Version:** 1.2 (includes Epic 7: Payment & Subscription)
-**Last Updated:** 2025-09-24 (Sprint Change Proposal Applied)
+**Last Updated:** 2025-09-26 (Stories 1.5, 1.6, 1.7 created and approved)
 
 ---
 
 ## Quick Start
 
-### What Changed (Updated 2025-09-24)
+### What Changed (Updated 2025-09-26)
 1. ✅ **Multi-parent features deferred to v1.1** (3 weeks saved)
 2. ✅ **Epic 1-3 stories corrected** (infrastructure setup fixed)
 3. ✅ **iOS version updated** to 15.0+ (Family Controls requirement)
 4. ✅ **Epic 6 added** for v1.1 (multi-parent collaboration)
 5. ✅ **Epic 7 added** for v1.0 (Payment & Subscription Infrastructure)
 6. ✅ **Epic 1.7 added** (App Discovery Service foundation)
-7. ✅ **Sprint Change Proposal applied** (3 critical blocking issues resolved)
+7. ✅ **Stories 1.5, 1.6, 1.7 created and approved** (CI/CD, Environment Config, App Discovery)
+8. ✅ **Sprint Change Proposal applied** (3 critical blocking issues resolved)
 
 ### What to Build First
 
 **Week 1-2: Epic 1 - Foundation (Updated)**
 ```
-Story 1.1: SPM package structure + Xcode project
-Story 1.2: Family Controls integration
-Story 1.3: CloudKit schema + repository protocols + VALIDATION CHECKPOINT
-Story 1.4: iCloud authentication (single-parent)
-Story 1.7: App Discovery Service foundation (NEW - required for Epic 2)
+✅ Story 1.1: SPM package structure + Xcode project
+✅ Story 1.2: Family Controls integration
+✅ Story 1.3: CloudKit schema + repository protocols + VALIDATION CHECKPOINT
+✅ Story 1.4: iCloud authentication (single-parent)
+✅ Story 1.5: CI/CD pipeline setup
+✅ Story 1.6: Development environment configuration
+✅ Story 1.7: App Discovery Service foundation (NEW - required for Epic 2)
 ```
 
-**Start Here:** Story 1.1 - Project scaffolding
+**Start Here:** Story 1.1 - Project scaffolding (if not already started)
 
 ---
 
@@ -106,6 +109,15 @@ Story 1.7: App Discovery Service foundation (NEW - required for Epic 2)
 
 ---
 
+### NEW: CI/CD and Environment Configuration (Stories 1.5, 1.6)
+**Added Stories:**
+- Story 1.5: CI/CD pipeline setup (Xcode Cloud, automated testing, TestFlight deployment)
+- Story 1.6: Development environment configuration (StoreKit, CloudKit environments, build configs)
+
+**Action:** Implement these stories to enable proper development, testing, and deployment workflows
+
+---
+
 ## Technology Stack Reference
 
 | Category | Technology | Version | Notes |
@@ -120,6 +132,7 @@ Story 1.7: App Discovery Service foundation (NEW - required for Epic 2)
 | **Testing** | XCTest | Xcode 15.0+ | Unit + Integration |
 | **Subscriptions** | StoreKit 2 | iOS 15.0+ | **NEW:** In-app purchases |
 | **Analytics** | CloudKit Functions | iOS 15.0+ | **NEW:** Subscription metrics |
+| **CI/CD** | Xcode Cloud | - | **NEW:** Native Apple CI/CD |
 
 **⚠️ Important:** Use Family Controls framework, NOT deprecated Screen Time API
 
@@ -133,6 +146,8 @@ Story 1.7: App Discovery Service foundation (NEW - required for Epic 2)
 ✅ Story 1.2: Family Controls integration (4 days)
 ✅ Story 1.3: CloudKit schema + repositories + VALIDATION CHECKPOINT (5 days)
 ✅ Story 1.4: iCloud auth (single-parent) (3 days)
+✅ Story 1.5: CI/CD pipeline setup (3 days)
+✅ Story 1.6: Development environment configuration (3 days)
 ✅ Story 1.7: App Discovery Service foundation (5 days) - NEW
 ```
 
@@ -247,6 +262,20 @@ struct Metadata {
 - ✅ Single parent can authenticate
 - ✅ Data isolation verified
 
+### NEW: Story 1.5 (CI/CD Pipeline)
+- ✅ Xcode Cloud pipeline configured and working
+- ✅ Automated testing pipeline functional
+- ✅ Code quality checks integrated
+- ✅ TestFlight deployment working
+- ✅ App Store Connect integration verified
+
+### NEW: Story 1.6 (Environment Configuration)
+- ✅ StoreKit configuration files created and working
+- ✅ CloudKit environments configured for Dev/Prod
+- ✅ Build configurations properly set up
+- ✅ Development environment tools functional
+- ✅ Testing configurations verified
+
 ### NEW: Story 1.7 (App Discovery Service)
 - ✅ App Discovery Service foundation implemented
 - ✅ Integration with Epic 2.1 dependencies verified
@@ -275,6 +304,7 @@ struct Metadata {
 7. ❌ Start Epic 2 without Story 1.3 validation checkpoint passing
 8. ❌ Skip Epic 1.7 (App Discovery) - required for Epic 2.1
 9. ❌ Implement subscription features without StoreKit 2
+10. ❌ Skip CI/CD setup (Stories 1.5, 1.6) - needed for proper development workflow
 
 ### ✅ Do This
 1. ✅ Create all SPM packages in Story 1.1
@@ -286,6 +316,7 @@ struct Metadata {
 7. ✅ Complete Story 1.7 (App Discovery) before Epic 2
 8. ✅ Integrate Epic 7 Core (StoreKit) before Epic 3 (onboarding)
 9. ✅ Set up App Store Connect products early (Epic 7.1)
+10. ✅ Implement CI/CD pipeline (Stories 1.5, 1.6) for proper development workflow
 
 ---
 
@@ -351,6 +382,9 @@ struct SubscriptionEntitlement {
 docs/prd.md                          # Product requirements (v1.0 + v1.1)
 docs/architecture.md                 # Technical architecture
 docs/po-validation-summary.md        # Validation results
+docs/stories/1.5.ci-cd-pipeline.md   # CI/CD setup story
+docs/stories/1.6.dev-environment-config.md # Environment config story
+docs/stories/1.7.app-discovery-service.md # App discovery story
 ```
 
 ### Slack/Communication
@@ -401,6 +435,9 @@ A: Physical device required for Family Controls. Simulator OK for UI-only work.
 **Q: What if I find a blocking issue?**
 A: Halt development, document issue, tag Product Owner (Sarah) immediately.
 
+**Q: Why are Stories 1.5 and 1.6 important?**
+A: These stories establish the development workflow, CI/CD pipeline, and testing infrastructure needed for the rest of the project.
+
 ---
 
 ## Success Criteria (v1.0 MVP)
@@ -439,8 +476,8 @@ A: Halt development, document issue, tag Product Owner (Sarah) immediately.
 
 ---
 
-**Document Version:** 1.2 (Epic 7 + Sprint Change Proposal)
-**Last Updated:** 2025-09-24
+**Document Version:** 1.3 (Stories 1.5, 1.6, 1.7 added)
+**Last Updated:** 2025-09-26
 **Status:** ✅ READY FOR DEVELOPMENT (95% Readiness)
 **Critical Issues Resolved:** 7 of 7 (100%)
 **Timeline:** 14 weeks MVP + 4 weeks v1.1 = 18 weeks total

@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "name": "internal-testers",
+      "description": "Internal development team testers",
+      "members": [
+        "developers@screentimerewards.com",
+        "qa@screentimerewards.com"
+      ]
+    },
+    {
+      "name": "family-testers",
+      "description": "Family members for beta testing",
+      "members": [
+        "family1@example.com",
+        "family2@example.com"
+      ]
+    }
+  ],
+  "defaultGroup": "internal-testers",
+  "testingInstructions": "This app requires Family Controls entitlement and iCloud account with Family Sharing enabled for full functionality. Please ensure you have these prerequisites before testing.",
+  "feedbackEmail": "beta-feedback@screentimerewards.com"
+}

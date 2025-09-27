@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestPlan
+   uuid="00000000-0000-0000-0000-000000000000"
+   name="ScreenTimeRewardsTests">
+   <TestableSummaries>
+      <TestableSummary
+         uuid="00000000-0000-0000-0000-000000000001"
+         name="ScreenTimeRewardsTests">
+         <TestableConfigurations>
+            <TestableConfiguration
+               uuid="00000000-0000-0000-0000-000000000002"
+               name="ScreenTimeRewardsTests">
+               <Testables>
+                  <TestableReference
+                     uuid="00000000-0000-0000-0000-000000000003"
+                     name="ScreenTimeRewardsTests"
+                     kind="bundle">
+                     <BuildableReference
+                        uuid="00000000-0000-0000-0000-000000000004"
+                        name="ScreenTimeRewardsTests"
+                        kind="bundle"
+                        buildableIdentifier="primary"
+                        blueprintIdentifier="00000000-0000-0000-0000-000000000005"
+                        buildableName="ScreenTimeRewardsTests.xctest"
+                        blueprintName="ScreenTimeRewardsTests"
+                        referencedContainer="container:ScreenTimeRewards.xcodeproj" />
+                  </TestableReference>
+               </Testables>
+            </TestableConfiguration>
+         </TestableConfigurations>
+      </TestableSummary>
+   </TestableSummaries>
+   <Configurations>
+      <Configuration
+         uuid="00000000-0000-0000-0000-000000000006"
+         name="Default">
+         <TestTargets>
+            <TestTarget
+               uuid="00000000-0000-0000-0000-000000000007"
+               name="ScreenTimeRewardsTests"
+               kind="bundle">
+               <BuildableReference
+                  uuid="00000000-0000-0000-0000-000000000008"
+                  name="ScreenTimeRewardsTests"
+                  kind="bundle"
+                  buildableIdentifier="primary"
+                  blueprintIdentifier="00000000-0000-0000-0000-000000000009"
+                  buildableName="ScreenTimeRewardsTests.xctest"
+                  blueprintName="ScreenTimeRewardsTests"
+                  referencedContainer="container:ScreenTimeRewards.xcodeproj" />
+            </TestTarget>
+         </TestTargets>
+      </Configuration>
+   </Configurations>
+</TestPlan>

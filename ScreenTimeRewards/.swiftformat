@@ -1,0 +1,19 @@
+# SwiftFormat Configuration
+
+# Format options
+--allman false
+--indent 4
+--linebreaks lf
+--maxwidth 100
+--semicolons never
+--stripunusedargs closure-only
+
+# Rules
+--disable redundantSelf
+--enable isEmpty
+--enable redundantBackticks
+--enable redundantVoidReturnType
+
+# Strict mode
+--verbose
+--strict
