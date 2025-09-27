@@ -89,6 +89,24 @@ public enum AppCategory: String, CaseIterable, Codable {
     case reward = "Reward"
 }
 
+// MARK: - App Filter for UI
+public enum AppFilter: CaseIterable {
+    case all
+    case learning
+    case reward
+
+    public var title: String {
+        switch self {
+        case .all:
+            return "All"
+        case .learning:
+            return "Learning"
+        case .reward:
+            return "Reward"
+        }
+    }
+}
+
 // MARK: - App Metadata
 public struct AppMetadata: Identifiable, Codable, Equatable {
     public let id: String

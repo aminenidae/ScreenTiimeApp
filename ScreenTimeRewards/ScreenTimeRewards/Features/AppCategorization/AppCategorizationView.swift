@@ -2,14 +2,16 @@
 //  AppCategorizationView.swift
 //  ScreenTimeRewards
 //
-//  Created by James on 2025-09-26.
-//  Updated by Quinn on 2025-09-27 to match existing SharedModels.
+//  Created by James on 2025-09-27.
+//  Updated by James on 2025-09-27 to implement enhanced app categorization screen.
 
 import SwiftUI
 import SharedModels
 
 struct AppCategorizationView: View {
     @StateObject private var viewModel = AppCategorizationViewModel()
+    @State private var isBulkMode = false
+    @State private var selectedFilter: AppFilter = .all
     
     var body: some View {
         NavigationView {
@@ -20,38 +22,52 @@ struct AppCategorizationView: View {
                 } else if viewModel.apps.isEmpty {
                     EmptyStateView()
                 } else {
-                    List {
-                        // Bulk categorization section
-                        Section(header: Text("Bulk Actions").font(.headline)) {
-                            HStack {
-                                Text("Select apps below, then:")
-                                Spacer()
-                            }
-                            
-                            HStack {
-                                Button("All to Learning") {
-                                    viewModel.bulkCategorize(to: .learning)
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Button("All to Reward") {
-                                    viewModel.bulkCategorize(to: .reward)
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Button("Clear Selection") {
-                                    viewModel.clearSelection()
-                                }
-                                .buttonStyle(.borderedProminent)
-                            }
-                            .padding(.vertical)
+                    // Search Bar
+                    SearchBarView(
+                        text: $viewModel.searchText,
+                        onSearch: {
+                            viewModel.filterApps()
+                        },
+                        onClear: {
+                            viewModel.filterApps()
                         }
-                        
-                        // App list
+                    )
+                    
+                    // Filter Bar
+                    FilterBarView(
+                        selectedFilter: $selectedFilter,
+                        onFilterChanged: { filter in
+                            viewModel.applyFilter(filter)
+                        }
+                    )
+                    
+                    // Bulk Action View
+                    BulkActionView(
+                        isBulkMode: $isBulkMode,
+                        selectedAppsCount: .constant(viewModel.selectedApps.count),
+                        onSelectAll: {
+                            viewModel.selectAllApps()
+                        },
+                        onSelectNone: {
+                            viewModel.clearSelection()
+                        },
+                        onBulkCategorize: { category in
+                            viewModel.bulkCategorize(to: category)
+                            isBulkMode = false
+                        },
+                        onCancel: {
+                            viewModel.clearSelection()
+                            isBulkMode = false
+                        }
+                    )
+                    
+                    // App list
+                    List {
                         ForEach(viewModel.filteredApps, id: \.id) { app in
                             AppCategoryRowView(
                                 app: app,
                                 isSelected: viewModel.selectedApps.contains(app.bundleID),
+                                isBulkMode: isBulkMode,
                                 selectedCategory: viewModel.appCategories[app.bundleID],
                                 pointsPerHour: viewModel.appPoints[app.bundleID] ?? 0,
                                 onCategoryChanged: { bundleID, category in
@@ -61,13 +77,14 @@ struct AppCategorizationView: View {
                                     viewModel.updatePointsPerHour(bundleID: bundleID, points: points)
                                 },
                                 onAppSelected: { bundleID in
-                                    viewModel.toggleAppSelection(bundleID: bundleID)
+                                    if isBulkMode {
+                                        viewModel.toggleAppSelection(bundleID: bundleID)
+                                    }
                                 }
                             )
                         }
                     }
                     .listStyle(InsetGroupedListStyle())
-                    .searchable(text: $viewModel.searchText, prompt: "Search apps...")
                     .refreshable {
                         await viewModel.loadApps()
                     }
@@ -130,6 +147,7 @@ struct EmptyStateView: View {
 struct AppCategoryRowView: View {
     let app: AppMetadata
     let isSelected: Bool
+    let isBulkMode: Bool
     let selectedCategory: AppCategory?
     let pointsPerHour: Int
     let onCategoryChanged: (String, AppCategory?) -> Void
@@ -138,13 +156,21 @@ struct AppCategoryRowView: View {
     
     var body: some View {
         HStack {
-            // Selection indicator
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.blue)
-            } else {
-                Image(systemName: "circle")
-                    .foregroundColor(.gray)
+            // Selection indicator for bulk mode
+            if isBulkMode {
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            onAppSelected(app.bundleID)
+                        }
+                } else {
+                    Image(systemName: "circle")
+                        .foregroundColor(.gray)
+                        .onTapGesture {
+                            onAppSelected(app.bundleID)
+                        }
+                }
             }
             
             // App icon and name
@@ -178,20 +204,22 @@ struct AppCategoryRowView: View {
                 .pickerStyle(.segmented)
                 .accessibilityLabel("Select category for \(app.displayName)")
                 
-                // Points per hour input
-                HStack {
-                    Text("Points/Hour:")
-                        .accessibilityLabel("Points per hour for \(app.displayName)")
-                    TextField("0", value: Binding(
-                        get: { pointsPerHour },
-                        set: { newValue in
-                            onPointsChanged(app.bundleID, newValue)
-                        }
-                    ), formatter: NumberFormatter())
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .keyboardType(.numberPad)
-                    .frame(width: 60)
-                    .accessibilityLabel("Points per hour input for \(app.displayName)")
+                // Points per hour input (only for learning apps)
+                if selectedCategory == .learning {
+                    HStack {
+                        Text("Points/Hour:")
+                            .accessibilityLabel("Points per hour for \(app.displayName)")
+                        TextField("0", value: Binding(
+                            get: { pointsPerHour },
+                            set: { newValue in
+                                onPointsChanged(app.bundleID, newValue)
+                            }
+                        ), formatter: NumberFormatter())
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.numberPad)
+                        .frame(width: 60)
+                        .accessibilityLabel("Points per hour input for \(app.displayName)")
+                    }
                 }
             }
             
@@ -199,7 +227,9 @@ struct AppCategoryRowView: View {
         }
         .contentShape(Rectangle()) // Make the entire row tappable
         .onTapGesture {
-            onAppSelected(app.bundleID)
+            if isBulkMode {
+                onAppSelected(app.bundleID)
+            }
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)

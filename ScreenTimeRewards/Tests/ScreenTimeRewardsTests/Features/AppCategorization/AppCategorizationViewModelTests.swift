@@ -2,7 +2,7 @@
 //  AppCategorizationViewModelTests.swift
 //  ScreenTimeRewardsTests
 //
-//  Created by James on 2025-09-26.
+//  Created by James on 2025-09-27.
 //
 
 import XCTest
@@ -57,8 +57,8 @@ class AppCategorizationViewModelTests: XCTestCase {
     }
     
     func testFilterApps() {
-        let app1 = AppMetadata(bundleID: "com.test.app1", displayName: "Test App 1", isSystemApp: false, iconData: nil)
-        let app2 = AppMetadata(bundleID: "com.test.app2", displayName: "Test App 2", isSystemApp: false, iconData: nil)
+        let app1 = AppMetadata(id: "1", bundleID: "com.test.app1", displayName: "Test App 1", isSystemApp: false, iconData: nil)
+        let app2 = AppMetadata(id: "2", bundleID: "com.test.app2", displayName: "Test App 2", isSystemApp: false, iconData: nil)
         
         viewModel.apps = [app1, app2]
         viewModel.filterApps()
@@ -92,5 +92,72 @@ class AppCategorizationViewModelTests: XCTestCase {
         
         // Learning app with points should pass validation
         XCTAssertTrue(viewModel.validateCategorizations())
+    }
+    
+    // MARK: - New Tests for Enhanced Functionality
+    
+    func testToggleAppSelection() {
+        let bundleID = "com.test.app"
+        XCTAssertFalse(viewModel.selectedApps.contains(bundleID))
+        
+        viewModel.toggleAppSelection(bundleID: bundleID)
+        XCTAssertTrue(viewModel.selectedApps.contains(bundleID))
+        
+        viewModel.toggleAppSelection(bundleID: bundleID)
+        XCTAssertFalse(viewModel.selectedApps.contains(bundleID))
+    }
+    
+    func testSelectAllApps() {
+        let app1 = AppMetadata(id: "1", bundleID: "com.test.app1", displayName: "Test App 1", isSystemApp: false, iconData: nil)
+        let app2 = AppMetadata(id: "2", bundleID: "com.test.app2", displayName: "Test App 2", isSystemApp: false, iconData: nil)
+        
+        viewModel.apps = [app1, app2]
+        viewModel.selectAllApps()
+        
+        XCTAssertEqual(viewModel.selectedApps.count, 2)
+        XCTAssertTrue(viewModel.selectedApps.contains("com.test.app1"))
+        XCTAssertTrue(viewModel.selectedApps.contains("com.test.app2"))
+    }
+    
+    func testClearSelection() {
+        let bundleID = "com.test.app"
+        viewModel.selectedApps.insert(bundleID)
+        XCTAssertTrue(viewModel.selectedApps.contains(bundleID))
+        
+        viewModel.clearSelection()
+        XCTAssertFalse(viewModel.selectedApps.contains(bundleID))
+        XCTAssertEqual(viewModel.selectedApps.count, 0)
+    }
+    
+    func testBulkCategorize() {
+        let app1 = AppMetadata(id: "1", bundleID: "com.test.app1", displayName: "Test App 1", isSystemApp: false, iconData: nil)
+        let app2 = AppMetadata(id: "2", bundleID: "com.test.app2", displayName: "Test App 2", isSystemApp: false, iconData: nil)
+        
+        viewModel.apps = [app1, app2]
+        viewModel.selectedApps = ["com.test.app1", "com.test.app2"]
+        
+        viewModel.bulkCategorize(to: .learning)
+        
+        XCTAssertEqual(viewModel.appCategories["com.test.app1"], .learning)
+        XCTAssertEqual(viewModel.appCategories["com.test.app2"], .learning)
+        XCTAssertEqual(viewModel.appPoints["com.test.app1"], 10)
+        XCTAssertEqual(viewModel.appPoints["com.test.app2"], 10)
+        XCTAssertEqual(viewModel.selectedApps.count, 0) // Selection should be cleared
+        XCTAssertTrue(viewModel.hasUnsavedChanges)
+    }
+    
+    func testUpdateAppCategoryToRewardRemovesPoints() {
+        let bundleID = "com.test.app"
+        viewModel.updateAppCategory(bundleID: bundleID, category: .learning)
+        viewModel.updatePointsPerHour(bundleID: bundleID, points: 10)
+        
+        // Verify points are set
+        XCTAssertEqual(viewModel.appPoints[bundleID], 10)
+        
+        // Change category to reward
+        viewModel.updateAppCategory(bundleID: bundleID, category: .reward)
+        
+        // Verify points are removed
+        XCTAssertNil(viewModel.appPoints[bundleID])
     }
 }

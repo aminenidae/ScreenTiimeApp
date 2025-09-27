@@ -97,33 +97,7 @@ struct AppCategorizationView: View {
     }
 }
 
-struct SettingsView: View {
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "gearshape.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.gray)
-
-            Text("Settings")
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Text("Manage your family settings, screen time limits, and app permissions.")
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
-            Button("Coming Soon") {
-                // TODO: Implement settings
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .padding()
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.large)
-    }
-}
+// SettingsView is now implemented in Features/Settings/Views/SettingsView.swift
 
 struct DetailedReportsView: View {
     var body: some View {
