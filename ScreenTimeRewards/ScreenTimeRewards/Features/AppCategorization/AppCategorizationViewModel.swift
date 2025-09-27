@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import FamilyControlsKit
 import SharedModels
+import CloudKitService
 
 @MainActor
 class AppCategorizationViewModel: ObservableObject {
@@ -28,6 +29,7 @@ class AppCategorizationViewModel: ObservableObject {
     private var _appCategories: [String: AppCategory] = [:]
     private var _appPoints: [String: Int] = [:]
     private let appDiscoveryService = AppDiscoveryService()
+    private let appCategorizationRepository = AppCategorizationRepository()
     private var cancellables = Set<AnyCancellable>()
     private let childProfileID = UUID() // In a real implementation, this would be provided
     
@@ -49,18 +51,28 @@ class AppCategorizationViewModel: ObservableObject {
                     bundleID: app.bundleID,
                     displayName: app.displayName,
                     isSystemApp: app.isSystemApp,
-                    iconData: nil // In a real implementation, we would convert the icon
+                    iconData: nil // In a real implementation, we would convert the Data to an Image
                 )
             }.sorted { $0.displayName < $1.displayName }
             
             // Load existing categorizations
-            // Note: This is a simplified implementation. In a real app, we would need to implement this method
-            // or use a different approach to fetch existing categorizations.
+            try await loadExistingCategorizations()
             
             // Apply initial filter
             filterApps()
         } catch {
             showError(message: "Error loading apps: \(error.localizedDescription)")
+        }
+    }
+    
+    private func loadExistingCategorizations() async throws {
+        // Load existing categorizations from repository
+        let categorizations = try await appCategorizationRepository.fetchCategorizations(for: childProfileID.uuidString)
+        
+        // Map categorizations to local storage
+        for categorization in categorizations {
+            _appCategories[categorization.appBundleID] = categorization.category
+            _appPoints[categorization.appBundleID] = categorization.pointsPerHour
         }
     }
     
@@ -156,8 +168,7 @@ class AppCategorizationViewModel: ObservableObject {
             )
             
             // Save to repository
-            // Note: In a real implementation, we would need to implement the save method
-            // or use a different approach to persist the categorization.
+            try await appCategorizationRepository.saveCategorization(appCategorization)
         }
     }
     

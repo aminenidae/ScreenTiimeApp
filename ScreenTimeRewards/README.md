@@ -133,10 +133,20 @@ Comprehensive UI toolkit:
 
 ### RewardCore
 Business logic and algorithms:
-- Point calculation engine
-- Achievement detection
-- Goal progress tracking
-- Reward validation
+- Point tracking engine implementation
+- Point calculation engine with category-based point values
+- Usage session processing and persistence
+- Background tracking capability
+- Edge case handling for app switching and device sleep/wake cycles
+- Integration with DeviceActivityMonitor for accurate time tracking
+- Data persistence with CloudKit synchronization
+- Comprehensive unit testing suite
+
+Key Components:
+- **PointTrackingService**: Central coordinator for tracking time spent in educational apps
+- **PointCalculationEngine**: Calculates points based on parent-defined values and app categories
+- **UsageSessionRepository**: Manages persistence of usage session data
+- **PointTransactionRepository**: Manages persistence of point transaction records
 
 ### CloudKitService
 Data persistence layer:

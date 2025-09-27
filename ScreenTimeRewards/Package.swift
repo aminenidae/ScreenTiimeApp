@@ -10,10 +10,10 @@ let package = Package(
     ],
     products: [
         .library(name: "SharedModels", targets: ["SharedModels"]),
-        .library(name: "DesignSystem", targets: ["DesignSystem"]),
-        .library(name: "RewardCore", targets: ["RewardCore"]),
         .library(name: "CloudKitService", targets: ["CloudKitService"]),
-        .library(name: "FamilyControlsKit", targets: ["FamilyControlsKit"])
+        .library(name: "FamilyControlsKit", targets: ["FamilyControlsKit"]),
+        .library(name: "RewardCore", targets: ["RewardCore"]),
+        .library(name: "DesignSystem", targets: ["DesignSystem"])
     ],
     dependencies: [
         // Code quality tools for development
@@ -25,60 +25,60 @@ let package = Package(
         .target(
             name: "SharedModels",
             dependencies: [],
-            path: "Packages/SharedModels/Sources/SharedModels"
+            path: "SharedModels/Sources/SharedModels"
         ),
         .testTarget(
             name: "SharedModelsTests",
             dependencies: ["SharedModels"],
-            path: "Packages/SharedModels/Tests/SharedModelsTests"
-        ),
-
-        // DesignSystem
-        .target(
-            name: "DesignSystem",
-            dependencies: ["SharedModels", "CloudKitService"],
-            path: "Packages/DesignSystem/Sources/DesignSystem"
-        ),
-        .testTarget(
-            name: "DesignSystemTests",
-            dependencies: ["DesignSystem"],
-            path: "Packages/DesignSystem/Tests/DesignSystemTests"
-        ),
-
-        // RewardCore
-        .target(
-            name: "RewardCore",
-            dependencies: ["SharedModels"],
-            path: "Packages/RewardCore/Sources/RewardCore"
-        ),
-        .testTarget(
-            name: "RewardCoreTests",
-            dependencies: ["RewardCore"],
-            path: "Packages/RewardCore/Tests/RewardCoreTests"
+            path: "SharedModels/Tests/SharedModelsTests"
         ),
 
         // CloudKitService
         .target(
             name: "CloudKitService",
             dependencies: ["SharedModels", "FamilyControlsKit"],
-            path: "Packages/CloudKitService/Sources/CloudKitService"
+            path: "CloudKitService/Sources/CloudKitService"
         ),
         .testTarget(
             name: "CloudKitServiceTests",
             dependencies: ["CloudKitService"],
-            path: "Packages/CloudKitService/Tests/CloudKitServiceTests"
+            path: "CloudKitService/Tests/CloudKitServiceTests"
         ),
 
         // FamilyControlsKit
         .target(
             name: "FamilyControlsKit",
             dependencies: ["SharedModels"],
-            path: "Packages/FamilyControlsKit/Sources/FamilyControlsKit"
+            path: "FamilyControlsKit/Sources/FamilyControlsKit"
         ),
         .testTarget(
             name: "FamilyControlsKitTests",
             dependencies: ["FamilyControlsKit"],
-            path: "Packages/FamilyControlsKit/Tests/FamilyControlsKitTests"
+            path: "FamilyControlsKit/Tests/FamilyControlsKitTests"
+        ),
+        
+        // RewardCore
+        .target(
+            name: "RewardCore",
+            dependencies: ["SharedModels", "CloudKitService", "FamilyControlsKit"],
+            path: "RewardCore/Sources/RewardCore"
+        ),
+        .testTarget(
+            name: "RewardCoreTests",
+            dependencies: ["RewardCore"],
+            path: "RewardCore/Tests/RewardCoreTests"
+        ),
+        
+        // DesignSystem
+        .target(
+            name: "DesignSystem",
+            dependencies: ["SharedModels"],
+            path: "DesignSystem/Sources/DesignSystem"
+        ),
+        .testTarget(
+            name: "DesignSystemTests",
+            dependencies: ["DesignSystem"],
+            path: "DesignSystem/Tests/DesignSystemTests"
         )
     ]
 )
