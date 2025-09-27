@@ -9,19 +9,22 @@ let package = Package(
         .iOS(.v15)
     ],
     products: [
-        .library(
-            name: "CloudKitService",
-            targets: ["CloudKitService"])
+        .library(name: "CloudKitService", targets: ["CloudKitService"])
     ],
     dependencies: [
-        .package(name: "SharedModels", path: "../SharedModels")
+        .package(path: "../SharedModels"),
+        .package(path: "../FamilyControlsKit")
     ],
     targets: [
         .target(
             name: "CloudKitService",
-            dependencies: ["SharedModels"]),
+            dependencies: ["SharedModels", "FamilyControlsKit"],
+            path: "Sources/CloudKitService"
+        ),
         .testTarget(
             name: "CloudKitServiceTests",
-            dependencies: ["CloudKitService"])
+            dependencies: ["CloudKitService"],
+            path: "Tests/CloudKitServiceTests"
+        )
     ]
 )

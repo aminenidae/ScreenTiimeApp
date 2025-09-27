@@ -14,12 +14,13 @@ let package = Package(
             targets: ["DesignSystem"])
     ],
     dependencies: [
-        .package(name: "SharedModels", path: "../SharedModels")
+        .package(name: "SharedModels", path: "../SharedModels"),
+        .package(name: "CloudKitService", path: "../CloudKitService")
     ],
     targets: [
         .target(
             name: "DesignSystem",
-            dependencies: ["SharedModels"]),
+            dependencies: ["SharedModels", "CloudKitService"]),
         .testTarget(
             name: "DesignSystemTests",
             dependencies: ["DesignSystem"])

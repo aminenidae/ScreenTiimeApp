@@ -2,10 +2,13 @@ import Foundation
 #if canImport(FamilyControls)
 import FamilyControls
 #endif
+#if canImport(OSLog)
 import OSLog
+#endif
 
 // MARK: - Authorization Service Protocol
 
+#if canImport(FamilyControls)
 /// Protocol for Family Controls authorization operations
 @available(iOS 15.0, *)
 public protocol FamilyControlsAuthorizationServiceProtocol {
@@ -28,17 +31,40 @@ public protocol FamilyControlsAuthorizationServiceProtocol {
     @available(iOS 15.0, *)
     func isChild() -> Bool
 }
+#else
+/// Protocol for Family Controls authorization operations
+public protocol FamilyControlsAuthorizationServiceProtocol {
+    /// Current authorization status
+    var authorizationStatus: Any { get }
+
+    /// Requests authorization for Family Controls
+    /// - Returns: Authorization status after request
+    func requestAuthorization() async throws -> Any
+
+    /// Checks if the current user is a parent
+    /// - Returns: True if user has parent privileges
+    func isParent() -> Bool
+
+    /// Checks if the current user is a child
+    /// - Returns: True if user is in child role
+    func isChild() -> Bool
+}
+#endif
 
 // MARK: - Authorization Service Implementation
 
+#if canImport(FamilyControls)
 /// Service for managing Family Controls authorization
 @available(iOS 15.0, *)
 public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServiceProtocol {
-#if canImport(FamilyControls)
     // MARK: - Properties
 
     private let authorizationCenter: AuthorizationCenter
+    #if canImport(OSLog)
     private let logger = Logger(subsystem: "com.screentimerewards.familycontrolskit", category: "authorization")
+    #else
+    private let logger: Any = "Logger not available"
+    #endif
 
     // Authorization status caching
     private var cachedAuthorizationStatus: AuthorizationStatus?
@@ -71,7 +97,9 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
     }
 
     public func requestAuthorization() async throws -> AuthorizationStatus {
+        #if canImport(OSLog)
         logger.info("Requesting Family Controls authorization")
+        #endif
 
         do {
             if #available(iOS 16.0, *) {
@@ -82,24 +110,36 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
             }
             let status = authorizationCenter.authorizationStatus
 
+            #if canImport(OSLog)
             logger.info("Authorization request completed with status: \(String(describing: status))")
+            #endif
 
             switch status {
             case .notDetermined:
+                #if canImport(OSLog)
                 logger.warning("Authorization status is still not determined after request")
+                #endif
                 throw FamilyControlsAuthorizationError.requestFailed
             case .denied:
+                #if canImport(OSLog)
                 logger.error("Family Controls authorization was denied")
+                #endif
                 throw FamilyControlsAuthorizationError.authorizationDenied
             case .approved:
+                #if canImport(OSLog)
                 logger.info("Family Controls authorization approved")
+                #endif
                 return status
             @unknown default:
+                #if canImport(OSLog)
                 logger.error("Unknown authorization status: \(String(describing: status))")
+                #endif
                 throw FamilyControlsAuthorizationError.unknown
             }
         } catch {
+            #if canImport(OSLog)
             logger.error("Authorization request failed: \(error.localizedDescription)")
+            #endif
 
             if let fcError = error as? FamilyControlsAuthorizationError {
                 throw fcError
@@ -113,7 +153,9 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
         // Check if we have authorization - parents typically have authorization
         let hasAuthorization = authorizationStatus == .approved
 
+        #if canImport(OSLog)
         logger.debug("Parent role check - authorization status: \(String(describing: self.authorizationStatus)), isParent: \(hasAuthorization)")
+        #endif
 
         return hasAuthorization
     }
@@ -122,7 +164,9 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
         // Children typically don't have Family Controls authorization
         let isChildRole = authorizationStatus == .denied || authorizationStatus == .notDetermined
 
+        #if canImport(OSLog)
         logger.debug("Child role check - authorization status: \(String(describing: self.authorizationStatus)), isChild: \(isChildRole)")
+        #endif
 
         return isChildRole
     }
@@ -133,7 +177,9 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
     public func clearAuthorizationCache() {
         cachedAuthorizationStatus = nil
         lastStatusCheck = nil
+        #if canImport(OSLog)
         logger.debug("Authorization status cache cleared")
+        #endif
     }
 
     /// Checks if authorization is required
@@ -178,9 +224,16 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
             return "Please check your Family Controls settings in the Settings app."
         }
     }
+}
 #else
+/// Service for managing Family Controls authorization
+public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServiceProtocol {
     // MARK: - Properties
+    #if canImport(OSLog)
     private let logger = Logger(subsystem: "com.screentimerewards.familycontrolskit", category: "authorization")
+    #else
+    private let logger: Any = "Logger not available"
+    #endif
 
     // Authorization status caching
     private var lastStatusCheck: Date?
@@ -215,7 +268,9 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
     /// Clears cached authorization status to force fresh check
     public func clearAuthorizationCache() {
         lastStatusCheck = nil
+        #if canImport(OSLog)
         logger.debug("Authorization status cache cleared")
+        #endif
     }
 
     /// Checks if authorization is required
@@ -242,11 +297,12 @@ public class FamilyControlsAuthorizationService: FamilyControlsAuthorizationServ
     public func getAuthorizationGuidance() -> String {
         return "Family Controls is only available on iOS devices"
     }
-#endif
 }
+#endif
 
 // MARK: - Error Types
 
+#if canImport(FamilyControls)
 @available(iOS 15.0, *)
 public enum FamilyControlsAuthorizationError: Error, LocalizedError {
     case authorizationDenied
@@ -283,6 +339,19 @@ public enum FamilyControlsAuthorizationError: Error, LocalizedError {
         }
     }
 }
+#else
+public enum FamilyControlsAuthorizationError: Error, LocalizedError {
+    case unavailable
+    
+    public var errorDescription: String? {
+        return "Family Controls is not available on this platform"
+    }
+    
+    public var recoverySuggestion: String? {
+        return "Family Controls is only available on iOS devices"
+    }
+}
+#endif
 
 #if canImport(FamilyControls)
 // MARK: - Authorization Status Extensions

@@ -36,7 +36,7 @@ let package = Package(
         // DesignSystem
         .target(
             name: "DesignSystem",
-            dependencies: ["SharedModels"],
+            dependencies: ["SharedModels", "CloudKitService"],
             path: "Packages/DesignSystem/Sources/DesignSystem"
         ),
         .testTarget(

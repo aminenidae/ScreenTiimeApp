@@ -1,7 +1,6 @@
 import XCTest
-import FamilyControls
 @testable import FamilyControlsKit
-@testable import SharedModels
+import SharedModels
 
 final class FamilyControlsKitTests: XCTestCase {
 
@@ -233,5 +232,29 @@ final class FamilyControlsKitTests: XCTestCase {
 
         // Test passes if no exception is thrown
         XCTAssertTrue(true)
+    }
+    
+    func testAppDiscoveryServiceCreation() {
+        let service = AppDiscoveryService()
+        XCTAssertNotNil(service)
+    }
+    
+    func testFetchInstalledApps() async throws {
+        let service = AppDiscoveryService()
+        let apps = try await service.fetchInstalledApps()
+        
+        XCTAssertNotNil(apps)
+        XCTAssertGreaterThan(apps.count, 0)
+        
+        // Check that we have some expected apps
+        let duolingoApp = apps.first { $0.bundleID == "com.duolingo.duolingoapp" }
+        XCTAssertNotNil(duolingoApp)
+        XCTAssertEqual(duolingoApp?.displayName, "Duolingo")
+        XCTAssertEqual(duolingoApp?.isSystemApp, false)
+        
+        let mapsApp = apps.first { $0.bundleID == "com.apple.Maps" }
+        XCTAssertNotNil(mapsApp)
+        XCTAssertEqual(mapsApp?.displayName, "Maps")
+        XCTAssertEqual(mapsApp?.isSystemApp, true)
     }
 }

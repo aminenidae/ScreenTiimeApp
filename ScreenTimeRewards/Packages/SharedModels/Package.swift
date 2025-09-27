@@ -9,16 +9,18 @@ let package = Package(
         .iOS(.v15)
     ],
     products: [
-        .library(
-            name: "SharedModels",
-            targets: ["SharedModels"])
+        .library(name: "SharedModels", targets: ["SharedModels"])
     ],
     targets: [
         .target(
             name: "SharedModels",
-            dependencies: []),
+            dependencies: [],
+            path: "Sources/SharedModels"
+        ),
         .testTarget(
             name: "SharedModelsTests",
-            dependencies: ["SharedModels"])
+            dependencies: ["SharedModels"],
+            path: "Tests/SharedModelsTests"
+        )
     ]
 )

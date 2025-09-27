@@ -83,33 +83,93 @@ public struct AuthState: Codable {
     }
 }
 
-// MARK: - App Category and Session Models
-
-public enum AppCategory: String, Codable, CaseIterable {
-    case educational = "educational"
-    case entertainment = "entertainment"
-    case social = "social"
-    case gaming = "gaming"
-    case productivity = "productivity"
-    case other = "other"
+// MARK: - AppCategory Enum
+public enum AppCategory: String, CaseIterable, Codable {
+    case learning = "learning"
+    case reward = "reward"
 }
 
-public struct AppCategorization: Codable, Identifiable {
+// MARK: - AppMetadata Model
+public struct AppMetadata: Identifiable, Codable, Equatable {
+    public let id: String
+    public let bundleID: String
+    public let displayName: String
+    public let isSystemApp: Bool
+    public let iconData: Data?
+    
+    public init(
+        id: String,
+        bundleID: String,
+        displayName: String,
+        isSystemApp: Bool,
+        iconData: Data?
+    ) {
+        self.id = id
+        self.bundleID = bundleID
+        self.displayName = displayName
+        self.isSystemApp = isSystemApp
+        self.iconData = iconData
+    }
+    
+    public init(
+        bundleID: String,
+        displayName: String,
+        isSystemApp: Bool,
+        iconData: Data?
+    ) {
+        self.id = UUID().uuidString
+        self.bundleID = bundleID
+        self.displayName = displayName
+        self.isSystemApp = isSystemApp
+        self.iconData = iconData
+    }
+}
+
+// MARK: - AppCategorization Model
+public struct AppCategorization: Identifiable, Codable, Equatable {
     public let id: String
     public let appBundleID: String
     public let category: AppCategory
     public let childProfileID: String
+    public let pointsPerHour: Int
     public let createdAt: Date
+    public let updatedAt: Date
     
-    public init(id: String, appBundleID: String, category: AppCategory, childProfileID: String, createdAt: Date) {
+    public init(
+        id: String,
+        appBundleID: String,
+        category: AppCategory,
+        childProfileID: String,
+        pointsPerHour: Int,
+        createdAt: Date,
+        updatedAt: Date = Date()
+    ) {
         self.id = id
         self.appBundleID = appBundleID
         self.category = category
         self.childProfileID = childProfileID
+        self.pointsPerHour = pointsPerHour
         self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+    
+    public init(
+        appBundleID: String,
+        category: AppCategory,
+        childProfileID: String,
+        pointsPerHour: Int
+    ) {
+        self.id = UUID().uuidString
+        self.appBundleID = appBundleID
+        self.category = category
+        self.childProfileID = childProfileID
+        self.pointsPerHour = pointsPerHour
+        self.createdAt = Date()
+        self.updatedAt = Date()
     }
 }
 
+// MARK: - UsageSession Model
 public struct UsageSession: Codable, Identifiable {
     public let id: String
     public let childProfileID: String

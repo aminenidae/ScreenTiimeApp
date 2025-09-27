@@ -1,9 +1,61 @@
 import XCTest
 @testable import CloudKitService
-@testable import SharedModels
+import SharedModels
 
 final class CloudKitServiceTests: XCTestCase {
 
+    var repository: AppCategorizationRepository!
+    
+    override func setUp() {
+        super.setUp()
+        repository = AppCategorizationRepository()
+    }
+    
+    override func tearDown() {
+        repository = nil
+        super.tearDown()
+    }
+    
+    func testRepositoryCreation() {
+        XCTAssertNotNil(repository)
+    }
+    
+    func testSaveCategorization() async throws {
+        let categorization = AppCategorization(
+            appBundleID: "com.test.app",
+            category: .learning,
+            childProfileID: "child-123",
+            pointsPerHour: 10
+        )
+        
+        // This should not throw an error in the mock implementation
+        try await repository.save(categorization: categorization)
+    }
+    
+    func testFetchCategorizations() async throws {
+        let childProfileID = UUID()
+        let categorizations = try await repository.fetchCategorizations(for: childProfileID)
+        
+        // In the mock implementation, this should return an empty array
+        XCTAssertTrue(categorizations.isEmpty)
+    }
+    
+    func testFetchCategorizationByBundleID() async throws {
+        let bundleID = "com.test.app"
+        let childProfileID = UUID()
+        let categorization = try await repository.fetchCategorization(by: bundleID, childProfileID: childProfileID)
+        
+        // In the mock implementation, this should return nil
+        XCTAssertNil(categorization)
+    }
+    
+    func testDeleteCategorization() async throws {
+        let categorizationID = UUID()
+        
+        // This should not throw an error in the mock implementation
+        try await repository.delete(categorizationID: categorizationID)
+    }
+    
     func testCloudKitServiceSingleton() {
         let service1 = CloudKitService.shared
         let service2 = CloudKitService.shared

@@ -9,19 +9,21 @@ let package = Package(
         .iOS(.v15)
     ],
     products: [
-        .library(
-            name: "FamilyControlsKit",
-            targets: ["FamilyControlsKit"])
+        .library(name: "FamilyControlsKit", targets: ["FamilyControlsKit"])
     ],
     dependencies: [
-        .package(name: "SharedModels", path: "../SharedModels")
+        .package(path: "../SharedModels")
     ],
     targets: [
         .target(
             name: "FamilyControlsKit",
-            dependencies: ["SharedModels"]),
+            dependencies: ["SharedModels"],
+            path: "Sources/FamilyControlsKit"
+        ),
         .testTarget(
             name: "FamilyControlsKitTests",
-            dependencies: ["FamilyControlsKit"])
+            dependencies: ["FamilyControlsKit"],
+            path: "Tests/FamilyControlsKitTests"
+        )
     ]
 )
