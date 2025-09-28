@@ -70,7 +70,7 @@ public enum ApplicationCategory {
 }
 
 /// Service responsible for managing Family Controls and ManagedSettings for reward time allocation
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 10.15, *)
 public class FamilyControlsService: ObservableObject {
     public static let shared = FamilyControlsService()
 
@@ -329,11 +329,12 @@ public class FamilyControlsService: ObservableObject {
         print("DEVELOPMENT: Would remove reward time settings for redemption \(redemptionID)")
         #endif
     }
+
 }
 
 // MARK: - Result Types
 
-public enum RewardTimeAllocationResult {
+public enum RewardTimeAllocationResult: Equatable {
     case success(allocatedMinutes: Int)
     case authorizationRequired
     case redemptionExpired
@@ -367,6 +368,12 @@ public enum FamilyControlsError: Error, LocalizedError {
     case notImplemented(String)
     case invalidRedemption
     case managedSettingsError(String)
+    case authorizationDenied
+    case authorizationRestricted
+    case unavailable
+    case monitoringFailed(Error)
+    case timeLimitFailed(Error)
+    case restrictionFailed(Error)
 
     public var errorDescription: String? {
         switch self {
@@ -380,12 +387,58 @@ public enum FamilyControlsError: Error, LocalizedError {
             return "Invalid or expired redemption"
         case .managedSettingsError(let message):
             return "Managed Settings error: \(message)"
+        case .authorizationDenied:
+            return "Family Controls authorization was denied"
+        case .authorizationRestricted:
+            return "Family Controls authorization is restricted"
+        case .unavailable:
+            return "Family Controls service is unavailable"
+        case .monitoringFailed(let error):
+            return "Monitoring failed: \(error.localizedDescription)"
+        case .timeLimitFailed(let error):
+            return "Time limit configuration failed: \(error.localizedDescription)"
+        case .restrictionFailed(let error):
+            return "Restriction configuration failed: \(error.localizedDescription)"
+        }
+    }
+}
+
+// MARK: - Equatable Conformance
+
+extension FamilyControlsError: Equatable {
+    public static func == (lhs: FamilyControlsError, rhs: FamilyControlsError) -> Bool {
+        switch (lhs, rhs) {
+        case (.authorizationRequired, .authorizationRequired):
+            return true
+        case (.simulatorNotSupported, .simulatorNotSupported):
+            return true
+        case (.notImplemented(let lhsMessage), .notImplemented(let rhsMessage)):
+            return lhsMessage == rhsMessage
+        case (.invalidRedemption, .invalidRedemption):
+            return true
+        case (.managedSettingsError(let lhsMessage), .managedSettingsError(let rhsMessage)):
+            return lhsMessage == rhsMessage
+        case (.authorizationDenied, .authorizationDenied):
+            return true
+        case (.authorizationRestricted, .authorizationRestricted):
+            return true
+        case (.unavailable, .unavailable):
+            return true
+        case (.monitoringFailed, .monitoringFailed),
+             (.timeLimitFailed, .timeLimitFailed),
+             (.restrictionFailed, .restrictionFailed):
+            // For errors with associated Error values, we can't easily compare them
+            // so we'll return false to be safe
+            return false
+        default:
+            return false
         }
     }
 }
 
 // MARK: - Extension for PointToTimeRedemption Integration
 
+@available(iOS 15.0, macOS 10.15, *)
 extension FamilyControlsService {
     /// Convenience method to allocate reward time from a PointToTimeRedemption
     public func allocateRewardTime(

@@ -16,7 +16,9 @@ final class SimpleCloudKitServiceTests: XCTestCase {
             appBundleID: "com.example.app",
             category: .learning,
             childProfileID: "child-123",
-            pointsPerHour: 10
+            pointsPerHour: 10,
+            createdAt: Date(),
+            updatedAt: Date()
         )
         
         // This should not throw an error in the mock implementation

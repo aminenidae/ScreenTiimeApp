@@ -1,15 +1,9 @@
 import Foundation
 import SharedModels
 
+// Remove the duplicate protocol definition since it's now in SharedModels
 @available(iOS 15.0, macOS 10.15, *)
-public protocol AppCategorizationRepositoryProtocol {
-    func saveCategorization(_ categorization: AppCategorization) async throws
-    func fetchCategorizations(for childProfileID: String) async throws -> [AppCategorization]
-    func deleteCategorization(with id: String) async throws
-}
-
-@available(iOS 15.0, macOS 10.15, *)
-public class AppCategorizationRepository: AppCategorizationRepositoryProtocol {
+public class AppCategorizationRepository: SharedModels.AppCategorizationRepository {
     
     public init() {}
     
@@ -35,5 +29,32 @@ public class AppCategorizationRepository: AppCategorizationRepositoryProtocol {
         // This is a mock implementation for demonstration purposes
         // In a real app, we would use CloudKit to delete the categorization
         print("Deleting categorization with id: \(id)")
+    }
+    
+    // MARK: - SharedModels.AppCategorizationRepository conformance
+    
+    public func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
+        try await saveCategorization(categorization)
+        return categorization
+    }
+    
+    public func fetchAppCategorization(id: String) async throws -> AppCategorization? {
+        // In a real implementation, this would fetch by ID
+        // For now, return nil as the existing implementation doesn't support ID-based fetch
+        return nil
+    }
+    
+    public func fetchAppCategorizations(for childID: String) async throws -> [AppCategorization] {
+        return try await fetchCategorizations(for: childID)
+    }
+    
+    public func updateAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
+        // Map to save method (update is same as save in this implementation)
+        try await saveCategorization(categorization)
+        return categorization
+    }
+    
+    public func deleteAppCategorization(id: String) async throws {
+        try await deleteCategorization(with: id)
     }
 }

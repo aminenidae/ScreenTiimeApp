@@ -20,6 +20,14 @@ let package = Package(
                 "SharedModels"
             ],
             path: "Tests/IntegrationTests"
+        ),
+        .testTarget(
+            name: "PerformanceTests",
+            dependencies: [
+                "CloudKitService",
+                "SharedModels"
+            ],
+            path: "Tests/PerformanceTests"
         )
     ]
 )

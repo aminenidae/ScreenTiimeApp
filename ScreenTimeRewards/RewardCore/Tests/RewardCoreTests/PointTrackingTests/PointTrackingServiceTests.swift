@@ -73,7 +73,7 @@ final class PointTrackingServiceTests: XCTestCase {
 class MockPointCalculationEngine: PointCalculationEngine {
     private(set) var calculatePointsCalled = false
     
-    override func calculatePoints(for session: UsageSession) -> Int {
+    override func calculatePoints(for session: UsageSession, pointsPerHour: Int) -> Int {
         calculatePointsCalled = true
         return 20 // Return a fixed value for testing (learning app)
     }

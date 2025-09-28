@@ -120,7 +120,7 @@ public class NotificationService: NotificationServiceProtocol {
     
     // MARK: - Private Helpers
     
-    private func isWithinQuietHours(preferences: NotificationPreferences) -> Bool {
+    func isWithinQuietHours(preferences: NotificationPreferences) -> Bool {
         guard let quietStart = preferences.quietHoursStart,
               let quietEnd = preferences.quietHoursEnd else {
             return false // No quiet hours set
@@ -147,14 +147,14 @@ public class NotificationService: NotificationServiceProtocol {
         }
     }
     
-    private func minutesFromMidnight(for components: DateComponents) -> Int? {
+    func minutesFromMidnight(for components: DateComponents) -> Int? {
         guard let hour = components.hour, let minute = components.minute else {
             return nil
         }
         return hour * 60 + minute
     }
     
-    private func getTitle(for event: NotificationEvent, childName: String) -> String {
+    func getTitle(for event: NotificationEvent, childName: String) -> String {
         switch event {
         case .pointsEarned:
             return "\(childName) earned points!"
@@ -167,7 +167,7 @@ public class NotificationService: NotificationServiceProtocol {
         }
     }
     
-    private func getBody(for event: NotificationEvent, childName: String, payload: [String: Any]) -> String {
+    func getBody(for event: NotificationEvent, childName: String, payload: [String: Any]) -> String {
         switch event {
         case .pointsEarned:
             if let points = payload["points"] as? Int {

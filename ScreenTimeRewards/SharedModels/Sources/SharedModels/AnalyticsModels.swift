@@ -155,7 +155,7 @@ public struct AnalyticsAggregation: Codable, Equatable, Identifiable {
 
 // MARK: - Analytics Consent Level
 
-public enum AnalyticsConsentLevel: String, Codable, CaseIterable {
+public enum AnalyticsConsentLevel: String, Codable, CaseIterable, Sendable {
     case none                       // No analytics collection
     case essential                  // Crash reports and critical metrics only
     case standard                   // Feature usage and performance
@@ -198,6 +198,7 @@ public struct AnalyticsConsent: Codable, Equatable, Identifiable, Sendable {
 
 // MARK: - Analytics Event Collector Protocol
 
+@available(iOS 15.0, macOS 10.15, *)
 public protocol AnalyticsEventCollector {
     func trackEvent(_ event: AnalyticsEvent) async
     func trackFeatureUsage(feature: String, metadata: [String: String]?) async

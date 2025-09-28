@@ -533,35 +533,6 @@ public struct AchievementBadge: Codable, Equatable, Identifiable {
 // MARK: - Repository Protocols
 
 @available(iOS 15.0, macOS 10.15, *)
-public protocol EducationalGoalRepository {
-    func createGoal(_ goal: EducationalGoal) async throws -> EducationalGoal
-    func save(_ goal: EducationalGoal) async throws -> EducationalGoal
-    func fetchGoal(id: UUID) async throws -> EducationalGoal?
-    func fetchGoals(for childID: String) async throws -> [EducationalGoal]
-    func updateGoal(_ goal: EducationalGoal) async throws -> EducationalGoal
-    func delete(_ goalID: UUID) async throws
-}
-
-@available(iOS 15.0, macOS 10.15, *)
-public protocol AchievementBadgeRepository {
-    func createBadge(_ badge: AchievementBadge) async throws -> AchievementBadge
-    func save(_ badge: AchievementBadge) async throws -> AchievementBadge
-    func fetchBadge(id: UUID) async throws -> AchievementBadge?
-    func fetchBadges(for childID: String) async throws -> [AchievementBadge]
-    func updateBadge(_ badge: AchievementBadge) async throws -> AchievementBadge
-    func delete(_ badgeID: UUID) async throws
-}
-
-@available(iOS 15.0, macOS 10.15, *)
-public protocol FamilyRepository {
-    func createFamily(_ family: Family) async throws -> Family
-    func fetchFamily(id: String) async throws -> Family?
-    func updateFamily(_ family: Family) async throws -> Family
-    func deleteFamily(id: String) async throws
-    func fetchFamilies(for userID: String) async throws -> [Family]
-}
-
-@available(iOS 15.0, macOS 10.15, *)
 public protocol ChildProfileRepository {
     func createChild(_ child: ChildProfile) async throws -> ChildProfile
     func fetchChild(id: String) async throws -> ChildProfile?
@@ -598,15 +569,6 @@ public protocol PointTransactionRepository {
 }
 
 @available(iOS 15.0, macOS 10.15, *)
-public protocol RewardRedemptionRepository {
-    func createRedemption(_ redemption: RewardRedemption) async throws -> RewardRedemption
-    func fetchRedemption(id: String) async throws -> RewardRedemption?
-    func fetchRedemptions(for childID: String) async throws -> [RewardRedemption]
-    func updateRedemption(_ redemption: RewardRedemption) async throws -> RewardRedemption
-    func deleteRedemption(id: String) async throws
-}
-
-@available(iOS 15.0, macOS 10.15, *)
 public protocol PointToTimeRedemptionRepository {
     func createPointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption
     func fetchPointToTimeRedemption(id: String) async throws -> PointToTimeRedemption?
@@ -614,6 +576,15 @@ public protocol PointToTimeRedemptionRepository {
     func fetchActivePointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption]
     func updatePointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption
     func deletePointToTimeRedemption(id: String) async throws
+}
+
+@available(iOS 15.0, macOS 10.15, *)
+public protocol FamilyRepository {
+    func createFamily(_ family: Family) async throws -> Family
+    func fetchFamily(id: String) async throws -> Family?
+    func fetchFamilies(for userID: String) async throws -> [Family]
+    func updateFamily(_ family: Family) async throws -> Family
+    func deleteFamily(id: String) async throws
 }
 
 @available(iOS 15.0, macOS 10.15, *)
@@ -676,6 +647,95 @@ public enum NotificationEvent: String, CaseIterable, Codable {
     case weeklyMilestone = "weekly_milestone"
     case streakAchieved = "streak_achieved"
 }
+
+// MARK: - Application Usage Models
+
+public enum ApplicationCategory: String, Codable, Equatable {
+    case educational = "educational"
+    case entertainment = "entertainment"
+    case social = "social"
+    case productivity = "productivity"
+    case game = "game"
+    case other = "other"
+}
+
+public struct ApplicationUsage: Codable, Equatable {
+    public let token: String
+    public let displayName: String
+    public let category: ApplicationCategory
+    public let timeSpent: TimeInterval
+    public let pointsEarned: Int
+
+    public init(
+        token: String,
+        displayName: String,
+        category: ApplicationCategory,
+        timeSpent: TimeInterval,
+        pointsEarned: Int
+    ) {
+        self.token = token
+        self.displayName = displayName
+        self.category = category
+        self.timeSpent = timeSpent
+        self.pointsEarned = pointsEarned
+    }
+}
+
+public struct UsageReport: Codable, Equatable {
+    public let childID: String
+    public let date: Date
+    public let applications: [ApplicationUsage]
+    public let totalScreenTime: TimeInterval
+
+    public init(
+        childID: String,
+        date: Date,
+        applications: [ApplicationUsage],
+        totalScreenTime: TimeInterval
+    ) {
+        self.childID = childID
+        self.date = date
+        self.applications = applications
+        self.totalScreenTime = totalScreenTime
+    }
+}
+
+// MARK: - Device Activity Schedule
+
+public struct DeviceActivitySchedule: Codable, Equatable {
+    public let intervalStart: DateComponents
+    public let intervalEnd: DateComponents
+    public let repeats: Bool
+
+    public init(
+        intervalStart: DateComponents,
+        intervalEnd: DateComponents,
+        repeats: Bool = true
+    ) {
+        self.intervalStart = intervalStart
+        self.intervalEnd = intervalEnd
+        self.repeats = repeats
+    }
+
+    public static func dailySchedule(from startTime: DateComponents, to endTime: DateComponents) -> DeviceActivitySchedule {
+        return DeviceActivitySchedule(
+            intervalStart: startTime,
+            intervalEnd: endTime,
+            repeats: true
+        )
+    }
+
+    public static func allDay() -> DeviceActivitySchedule {
+        return DeviceActivitySchedule(
+            intervalStart: DateComponents(hour: 0, minute: 0),
+            intervalEnd: DateComponents(hour: 23, minute: 59),
+            repeats: true
+        )
+    }
+}
+
+// MARK: - Notification Models
+// NotificationEvent enum has been moved to RewardCore module to avoid circular dependency
 
 // MARK: - Validation Models (Moved from RewardCore to avoid circular dependency)
 

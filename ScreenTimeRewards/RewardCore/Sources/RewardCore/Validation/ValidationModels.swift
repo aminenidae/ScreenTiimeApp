@@ -28,7 +28,7 @@ public struct ValidationDetails: Codable {
     }
 }
 
-public enum GamingPattern: Codable {
+public enum GamingPattern: Codable, Equatable {
     case rapidAppSwitching(frequency: Double)
     case suspiciouslyLongSession(duration: TimeInterval)
     case exactHourBoundaries

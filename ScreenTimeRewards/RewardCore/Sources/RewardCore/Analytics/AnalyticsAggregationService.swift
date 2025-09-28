@@ -36,6 +36,59 @@ public class AnalyticsAggregationService: @unchecked Sendable {
         print("Performing monthly analytics aggregation")
     }
     
+    /// Aggregates events into an AnalyticsAggregation object
+    public func aggregateEvents(_ events: [AnalyticsEvent], for aggregationType: AggregationType, startDate: Date, endDate: Date) -> AnalyticsAggregation {
+        let featureUsageCounts = aggregateFeatureUsage(events: events)
+        let retentionMetrics = aggregateRetentionMetrics(events: events)
+        let performanceMetrics = aggregatePerformanceMetrics(events: events)
+        
+        // Calculate basic metrics
+        let uniqueUsers = Set(events.map { $0.anonymizedUserID }).count
+        let uniqueSessions = Set(events.map { $0.sessionID }).count
+        
+        // Calculate average session duration (simplified)
+        let totalDuration: TimeInterval = events.reduce(0) { (result, _) in result + 1.0 } // Simplified to 1 second per event
+        let averageSessionDuration = uniqueSessions > 0 ? totalDuration / Double(uniqueSessions) : 0
+        
+        return AnalyticsAggregation(
+            aggregationType: aggregationType,
+            startDate: startDate,
+            endDate: endDate,
+            totalUsers: uniqueUsers,
+            totalSessions: uniqueSessions,
+            averageSessionDuration: averageSessionDuration,
+            featureUsageCounts: featureUsageCounts,
+            retentionMetrics: retentionMetrics,
+            performanceMetrics: performanceMetrics
+        )
+    }
+    
+    /// Calculates retention metrics from events
+    public func calculateRetentionMetrics(from events: [AnalyticsEvent]) -> RetentionMetrics {
+        return RetentionMetrics(
+            dayOneRetention: 0.0,
+            daySevenRetention: 0.0,
+            dayThirtyRetention: 0.0,
+            cohortSize: 0
+        )
+    }
+    
+    /// Calculates performance metrics from events
+    public func calculatePerformanceMetrics(from events: [AnalyticsEvent]) -> PerformanceMetrics {
+        let memoryUsage = MemoryUsageMetrics(
+            averageMemory: 0.0,
+            peakMemory: 0.0,
+            memoryGrowthRate: 0.0
+        )
+        
+        return PerformanceMetrics(
+            averageAppLaunchTime: 0.0,
+            crashRate: 0.0,
+            averageBatteryImpact: 0.0,
+            memoryUsage: memoryUsage
+        )
+    }
+    
     // MARK: - Helper Methods
     
     /// Aggregates feature usage data

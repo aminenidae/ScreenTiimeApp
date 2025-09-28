@@ -1,10 +1,11 @@
 import Foundation
 import SharedModels
 
+@available(iOS 15.0, macOS 10.15, *)
 public class AppDiscoveryService {
-    
+
     public init() {}
-    
+
     /// Fetches installed apps using the Family Controls framework
     /// In a real implementation, this would use the actual Family Controls API
     public func fetchInstalledApps() async throws -> [AppMetadata] {

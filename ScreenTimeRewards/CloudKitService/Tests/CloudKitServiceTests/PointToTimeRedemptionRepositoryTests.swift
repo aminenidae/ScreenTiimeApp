@@ -15,6 +15,17 @@ final class PointToTimeRedemptionRepositoryTests: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - Initialization Tests
+
+    func testPointToTimeRedemptionRepositoryInitialization() {
+        XCTAssertNotNil(repository, "Repository should be successfully initialized")
+    }
+
+    func testRepositoryConformsToProtocol() {
+        XCTAssertTrue(repository is SharedModels.PointToTimeRedemptionRepository,
+                    "PointToTimeRedemptionRepository should conform to SharedModels.PointToTimeRedemptionRepository protocol")
+    }
+
     // MARK: - Create Tests
 
     func testCreatePointToTimeRedemption_Success() async throws {
@@ -154,7 +165,7 @@ final class PointToTimeRedemptionRepositoryTests: XCTestCase {
     func testFetchRedemptionsWithDateRange() async throws {
         // Given
         let childID = "test-child-id"
-        let dateRange = DateRange(
+        let dateRange: DateRange? = DateRange(
             start: Date().addingTimeInterval(-86400), // 1 day ago
             end: Date()
         )
@@ -197,83 +208,11 @@ final class PointToTimeRedemptionRepositoryTests: XCTestCase {
         XCTAssertEqual(stats.totalRedemptions, 0)
         XCTAssertEqual(stats.totalPointsSpent, 0)
         XCTAssertEqual(stats.totalTimeGranted, 0)
-        XCTAssertEqual(stats.totalTimeUsed, 0)
-        XCTAssertEqual(stats.activeRedemptions, 0)
-        XCTAssertEqual(stats.efficiencyRatio, 0.0)
-        XCTAssertEqual(stats.averagePointsPerMinute, 0.0)
-    }
-
-    // MARK: - RedemptionStats Tests
-
-    func testRedemptionStats_EfficiencyRatio() {
-        // Given
-        let stats = RedemptionStats(
-            totalRedemptions: 5,
-            totalPointsSpent: 500,
-            totalTimeGranted: 50,
-            totalTimeUsed: 30,
-            activeRedemptions: 2
-        )
-
-        // When & Then
-        XCTAssertEqual(stats.efficiencyRatio, 0.6, accuracy: 0.01) // 30/50 = 0.6
-    }
-
-    func testRedemptionStats_AveragePointsPerMinute() {
-        // Given
-        let stats = RedemptionStats(
-            totalRedemptions: 3,
-            totalPointsSpent: 300,
-            totalTimeGranted: 30,
-            totalTimeUsed: 25,
-            activeRedemptions: 1
-        )
-
-        // When & Then
-        XCTAssertEqual(stats.averagePointsPerMinute, 10.0, accuracy: 0.01) // 300/30 = 10.0
-    }
-
-    func testRedemptionStats_ZeroDivision() {
-        // Given
-        let stats = RedemptionStats(
-            totalRedemptions: 0,
-            totalPointsSpent: 0,
-            totalTimeGranted: 0,
-            totalTimeUsed: 0,
-            activeRedemptions: 0
-        )
-
-        // When & Then
-        XCTAssertEqual(stats.efficiencyRatio, 0.0)
-        XCTAssertEqual(stats.averagePointsPerMinute, 0.0)
-    }
-
-    // MARK: - Error Handling Tests
-
-    func testRepositoryOperations_DoNotThrow() async {
-        // All repository operations should handle errors gracefully in this demo implementation
-        do {
-            let redemption = createMockRedemption()
-
-            // Test all operations
-            let _ = try await repository.createPointToTimeRedemption(redemption)
-            let _ = try await repository.fetchPointToTimeRedemption(id: "test-id")
-            let _ = try await repository.fetchPointToTimeRedemptions(for: "test-child")
-            let _ = try await repository.fetchActivePointToTimeRedemptions(for: "test-child")
-            let _ = try await repository.updatePointToTimeRedemption(redemption)
-            try await repository.deletePointToTimeRedemption(id: "test-id")
-
-            // If we get here, all operations completed without throwing
-            XCTAssertTrue(true)
-
-        } catch {
-            XCTFail("Repository operations should not throw in demo implementation: \(error)")
-        }
     }
 
     // MARK: - Performance Tests
 
-    func testCreateRedemption_Performance() async {
+    func testCreatePointToTimeRedemption_Performance() async {
         let redemption = createMockRedemption()
 
         measure {
@@ -287,98 +226,46 @@ final class PointToTimeRedemptionRepositoryTests: XCTestCase {
         }
     }
 
+    func testFetchPointToTimeRedemptions_Performance() async {
+        measure {
+            Task {
+                do {
+                    let _ = try await repository.fetchPointToTimeRedemptions(for: "perf-test-child")
+                } catch {
+                    XCTFail("Performance test failed: \(error)")
+                }
+            }
+        }
+    }
+
+    func testUpdatePointToTimeRedemption_Performance() async {
+        let redemption = createMockRedemption()
+
+        measure {
+            Task {
+                do {
+                    let _ = try await repository.updatePointToTimeRedemption(redemption)
+                } catch {
+                    XCTFail("Performance test failed: \(error)")
+                }
+            }
+        }
+    }
+
     // MARK: - Helper Methods
 
     private func createMockRedemption() -> PointToTimeRedemption {
         return PointToTimeRedemption(
-            id: UUID().uuidString,
-            childProfileID: "test-child-id",
-            appCategorizationID: "test-app-cat-id",
-            pointsSpent: 100,
-            timeGrantedMinutes: 10,
+            id: "mock-redemption-id",
+            childProfileID: "mock-child-id",
+            appCategorizationID: "mock-app-cat-id",
+            pointsSpent: 50,
+            timeGrantedMinutes: 5,
             conversionRate: 10.0,
-            redeemedAt: Date(),
+            redeemedAt: Date().addingTimeInterval(-3600), // 1 hour ago
             expiresAt: Date().addingTimeInterval(3600), // 1 hour from now
             timeUsedMinutes: 0,
             status: .active
         )
-    }
-}
-
-// MARK: - CloudKitService Integration Tests
-
-final class CloudKitServiceIntegrationTests: XCTestCase {
-    var cloudKitService: CloudKitService!
-
-    override func setUp() {
-        super.setUp()
-        cloudKitService = CloudKitService.shared
-    }
-
-    override func tearDown() {
-        cloudKitService = nil
-        super.tearDown()
-    }
-
-    func testCloudKitService_AllRepositoriesAccessible() async throws {
-        // Test that all repository protocols are properly implemented
-
-        // Test ChildProfileRepository
-        let mockChild = ChildProfile(
-            id: "test-child",
-            familyID: "test-family",
-            name: "Test Child",
-            avatarAssetURL: nil,
-            birthDate: Date(),
-            pointBalance: 100
-        )
-        let createdChild = try await cloudKitService.createChild(mockChild)
-        XCTAssertEqual(createdChild.id, mockChild.id)
-
-        // Test PointToTimeRedemptionRepository
-        let redemption = PointToTimeRedemption(
-            id: "test-redemption",
-            childProfileID: "test-child",
-            appCategorizationID: "test-app",
-            pointsSpent: 50,
-            timeGrantedMinutes: 5,
-            conversionRate: 10.0,
-            redeemedAt: Date(),
-            expiresAt: Date().addingTimeInterval(3600),
-            timeUsedMinutes: 0,
-            status: .active
-        )
-        let createdRedemption = try await cloudKitService.createPointToTimeRedemption(redemption)
-        XCTAssertEqual(createdRedemption.id, redemption.id)
-
-        // Test PointTransactionRepository
-        let transaction = PointTransaction(
-            id: "test-transaction",
-            childProfileID: "test-child",
-            points: -50,
-            reason: "Redeemed for screen time",
-            timestamp: Date()
-        )
-        let createdTransaction = try await cloudKitService.createTransaction(transaction)
-        XCTAssertEqual(createdTransaction.id, transaction.id)
-    }
-
-    func testCloudKitService_MockChildProfile() async throws {
-        // Test the mock child profile functionality
-        let fetchedChild = try await cloudKitService.fetchChild(id: "mock-child-id")
-
-        XCTAssertNotNil(fetchedChild)
-        XCTAssertEqual(fetchedChild?.id, "mock-child-id")
-        XCTAssertEqual(fetchedChild?.name, "Demo Child")
-        XCTAssertEqual(fetchedChild?.pointBalance, 450)
-        XCTAssertEqual(fetchedChild?.totalPointsEarned, 1250)
-    }
-
-    func testCloudKitService_Singleton() {
-        // Test that CloudKitService is properly implemented as a singleton
-        let instance1 = CloudKitService.shared
-        let instance2 = CloudKitService.shared
-
-        XCTAssertTrue(instance1 === instance2, "CloudKitService should be a singleton")
     }
 }

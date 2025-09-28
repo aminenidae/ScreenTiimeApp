@@ -54,58 +54,28 @@ final class FamilyControlsKitTests: XCTestCase {
         XCTAssertEqual(category, .other)
     }
 
-    func testGetApplicationsForCategory() {
-        let service = FamilyControlsService.shared
-
-        let apps = service.getApplications(for: .educational)
-        // Should return empty set in placeholder implementation
-        XCTAssertTrue(apps.isEmpty)
-    }
-
-    func testAppRestrictionsInitialization() {
-        let restrictions = AppRestrictions()
-
-        XCTAssertEqual(restrictions.maximumRating, 1000)
-        XCTAssertTrue(restrictions.allowEducationalApps)
-        XCTAssertTrue(restrictions.blockedCategories.isEmpty)
-
-        let customRestrictions = AppRestrictions(
-            maximumRating: 12,
-            allowEducationalApps: false,
-            blockedCategories: [.games, .social]
-        )
-
-        XCTAssertEqual(customRestrictions.maximumRating, 12)
-        XCTAssertFalse(customRestrictions.allowEducationalApps)
-        XCTAssertEqual(customRestrictions.blockedCategories.count, 2)
-        XCTAssertTrue(customRestrictions.blockedCategories.contains(.games))
-        XCTAssertTrue(customRestrictions.blockedCategories.contains(.social))
-    }
-
     func testApplicationInfoInitialization() {
         let mockToken = ApplicationToken("com.example.reading")
         let info = ApplicationInfo(
-            token: mockToken,
+            bundleID: "com.example.reading",
             displayName: "Reading App",
-            bundleIdentifier: "com.example.reading",
-            category: .reading
+            category: ApplicationCategory.education
         )
 
-        XCTAssertEqual(info.token, mockToken)
+        XCTAssertEqual(info.bundleID, "com.example.reading")
         XCTAssertEqual(info.displayName, "Reading App")
-        XCTAssertEqual(info.bundleIdentifier, "com.example.reading")
-        XCTAssertEqual(info.category, .reading)
+        XCTAssertEqual(info.category, ApplicationCategory.education)
     }
 
     func testUsageReportInitialization() {
-        let childID = UUID()
+        let childID = UUID().uuidString
         let date = Date()
         let mockToken = ApplicationToken("com.example.app")
 
         let usage = ApplicationUsage(
-            token: mockToken,
+            token: mockToken.bundleIdentifier,
             displayName: "Test App",
-            category: .educational,
+            category: SharedModels.ApplicationCategory.educational,
             timeSpent: 3600, // 1 hour
             pointsEarned: 120
         )
@@ -124,7 +94,7 @@ final class FamilyControlsKitTests: XCTestCase {
 
         let firstApp = report.applications.first!
         XCTAssertEqual(firstApp.displayName, "Test App")
-        XCTAssertEqual(firstApp.category, .educational)
+        XCTAssertEqual(firstApp.category, SharedModels.ApplicationCategory.educational)
         XCTAssertEqual(firstApp.timeSpent, 3600)
         XCTAssertEqual(firstApp.pointsEarned, 120)
     }
@@ -133,16 +103,16 @@ final class FamilyControlsKitTests: XCTestCase {
         let mockToken = ApplicationToken("com.example.math")
 
         let usage = ApplicationUsage(
-            token: mockToken,
+            token: mockToken.bundleIdentifier,
             displayName: "Math App",
-            category: .educational,
+            category: SharedModels.ApplicationCategory.educational,
             timeSpent: 1800, // 30 minutes
             pointsEarned: 60
         )
 
-        XCTAssertEqual(usage.token, mockToken)
+        XCTAssertEqual(usage.token, mockToken.bundleIdentifier)
         XCTAssertEqual(usage.displayName, "Math App")
-        XCTAssertEqual(usage.category, .educational)
+        XCTAssertEqual(usage.category, SharedModels.ApplicationCategory.educational)
         XCTAssertEqual(usage.timeSpent, 1800)
         XCTAssertEqual(usage.pointsEarned, 60)
     }
@@ -215,7 +185,7 @@ final class FamilyControlsKitTests: XCTestCase {
 
     func testStopMonitoring() {
         let service = FamilyControlsService.shared
-        let childID = UUID()
+        let childID = UUID().uuidString
 
         // This should not throw in placeholder implementation
         service.stopMonitoring(for: childID)

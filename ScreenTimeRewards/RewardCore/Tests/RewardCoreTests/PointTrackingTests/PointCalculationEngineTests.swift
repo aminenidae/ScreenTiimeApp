@@ -131,7 +131,7 @@ final class PointCalculationEngineTests: XCTestCase {
         )
         
         // When
-        let points = engine.calculatePoints(for: session)
+        let points = engine.calculatePoints(for: session, pointsPerHour: 20)
         
         // Then
         XCTAssertEqual(points, 20, "1 hour of learning app usage should earn 20 points")
