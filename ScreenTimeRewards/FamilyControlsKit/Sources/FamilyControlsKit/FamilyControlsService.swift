@@ -1,8 +1,73 @@
-#if canImport(FamilyControls) && !os(macOS)
 import Foundation
+import SharedModels
+
+#if canImport(FamilyControls) && !os(macOS)
 import FamilyControls
 import ManagedSettings
-import SharedModels
+
+// MARK: - Type Aliases from FamilyControls (when available on iOS)
+
+/// Public type alias for ApplicationToken from FamilyControls
+public typealias ApplicationToken = String
+
+/// Public type alias for AuthorizationStatus from FamilyControls
+public typealias AuthorizationStatus = FamilyControls.AuthorizationStatus
+
+/// Public type alias for FamilyActivitySelection from FamilyControls
+public typealias FamilyActivitySelection = FamilyControls.FamilyActivitySelection
+
+#else
+
+// MARK: - Fallback Types (when FamilyControls not available)
+
+/// Fallback ApplicationToken for development/testing
+public struct ApplicationToken: Hashable {
+    public let bundleIdentifier: String
+
+    public init(_ bundleIdentifier: String) {
+        self.bundleIdentifier = bundleIdentifier
+    }
+}
+
+/// Fallback AuthorizationStatus for development/testing
+public enum AuthorizationStatus: CaseIterable {
+    case notDetermined
+    case denied
+    case approved
+}
+
+/// Fallback FamilyActivitySelection for development/testing
+public struct FamilyActivitySelection {
+    public var applicationTokens: Set<ApplicationToken> = []
+    public init() {}
+}
+
+#endif
+
+// MARK: - Supporting Types
+
+/// Application information structure
+public struct ApplicationInfo {
+    public let bundleID: String
+    public let displayName: String
+    public let category: ApplicationCategory
+
+    public init(bundleID: String, displayName: String, category: ApplicationCategory) {
+        self.bundleID = bundleID
+        self.displayName = displayName
+        self.category = category
+    }
+}
+
+/// Application category enumeration
+public enum ApplicationCategory {
+    case education
+    case game
+    case social
+    case productivity
+    case entertainment
+    case other
+}
 
 /// Service responsible for managing Family Controls and ManagedSettings for reward time allocation
 @available(iOS 15.0, *)
@@ -12,8 +77,10 @@ public class FamilyControlsService: ObservableObject {
     @Published public var authorizationStatus: AuthorizationStatus = .notDetermined
     @Published public var isAuthorized: Bool = false
 
+    #if canImport(FamilyControls) && !os(macOS)
     private let store = ManagedSettingsStore()
     private let authorizationCenter = AuthorizationCenter.shared
+    #endif
 
     public init() {
         checkAuthorizationStatus()
@@ -25,19 +92,34 @@ public class FamilyControlsService: ObservableObject {
     /// Requests Family Controls authorization from the parent
     @available(iOS 16.0, *)
     public func requestAuthorization() async throws {
+        #if canImport(FamilyControls) && !os(macOS)
         try await authorizationCenter.requestAuthorization(for: .child)
         await MainActor.run {
             checkAuthorizationStatus()
         }
+        #else
+        // Fallback for testing - simulate authorization
+        await MainActor.run {
+            self.authorizationStatus = .approved
+            self.isAuthorized = true
+        }
+        #endif
     }
 
     /// Checks current authorization status
     private func checkAuthorizationStatus() {
+        #if canImport(FamilyControls) && !os(macOS)
         authorizationStatus = authorizationCenter.authorizationStatus
         isAuthorized = authorizationStatus == .approved
+        #else
+        // Fallback for testing
+        authorizationStatus = .notDetermined
+        isAuthorized = false
+        #endif
     }
 
     private func setupAuthorizationObserver() {
+        #if canImport(FamilyControls) && !os(macOS)
         // Note: AuthorizationStatus.values is available in iOS 16.0+
         // For iOS 15.0 compatibility, we'll use a simpler approach
         if #available(iOS 16.0, *) {
@@ -54,6 +136,10 @@ public class FamilyControlsService: ObservableObject {
             // This is a simplified implementation for compatibility
             checkAuthorizationStatus()
         }
+        #else
+        // Fallback for testing - no authorization observer needed
+        checkAuthorizationStatus()
+        #endif
     }
 
     // MARK: - Reward Time Allocation
@@ -139,6 +225,54 @@ public class FamilyControlsService: ObservableObject {
         return []
     }
 
+    // MARK: - App Discovery and Management
+
+    /// Discovers applications available on the device
+    public func discoverApplications() -> FamilyActivitySelection {
+        #if targetEnvironment(simulator)
+        // Return empty selection for simulator
+        return FamilyActivitySelection()
+        #else
+        // In a real implementation, this would present the FamilyActivityPicker
+        // For now, return empty selection
+        return FamilyActivitySelection()
+        #endif
+    }
+
+    /// Gets application information for a given token
+    public func getApplicationInfo(for token: ApplicationToken) -> ApplicationInfo? {
+        // Placeholder implementation
+        return nil
+    }
+
+    /// Categorizes an application token
+    public func categorizeApplication(_ token: ApplicationToken) -> ApplicationCategory {
+        // Placeholder implementation
+        return .other
+    }
+
+    /// Gets current usage for applications since a specific time
+    public func getCurrentUsage(for applications: Set<ApplicationToken>, since startTime: Date) async -> [String: TimeInterval] {
+        // Placeholder implementation
+        return [:]
+    }
+
+    /// Gets current usage for applications during a specific time interval
+    public func getCurrentUsage(for applications: Set<ApplicationToken>, during interval: DateInterval) async -> [String: TimeInterval] {
+        // Placeholder implementation
+        return [:]
+    }
+
+    /// Stops monitoring for a specific child
+    public func stopMonitoring(for childID: String) {
+        // Placeholder implementation
+    }
+
+    /// Removes all restrictions
+    public func removeAllRestrictions() {
+        // Placeholder implementation
+    }
+
     // MARK: - Private Methods
 
     private func createApplicationToken(bundleID: String) async throws -> ApplicationToken {
@@ -146,13 +280,13 @@ public class FamilyControlsService: ObservableObject {
         // to create an application token for the specific bundle ID
         // For now, we'll simulate this functionality
 
-        #if targetEnvironment(simulator)
-        // Simulator doesn't support Family Controls, return a mock token
-        throw FamilyControlsError.simulatorNotSupported
-        #else
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
         // On device, this would use the actual Family Controls API
         // This is a placeholder implementation
         throw FamilyControlsError.notImplemented("ApplicationToken creation not implemented in demo")
+        #else
+        // Simulator/macOS doesn't support Family Controls, return a mock token
+        throw FamilyControlsError.simulatorNotSupported
         #endif
     }
 
@@ -166,10 +300,7 @@ public class FamilyControlsService: ObservableObject {
         // 2. Set up application restrictions that expire after the allocated time
         // 3. Store metadata linking the settings to the redemption ID
 
-        #if targetEnvironment(simulator)
-        // Simulator implementation - log the operation
-        print("SIMULATOR: Would allocate \(timeMinutes) minutes for redemption \(redemptionID)")
-        #else
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
         // Device implementation would use actual ManagedSettings APIs
         let settings = store
 
@@ -179,6 +310,9 @@ public class FamilyControlsService: ObservableObject {
         // settings.dateAndTime.bedtime = DateComponents(hour: 22, minute: 0) // Example
 
         throw FamilyControlsError.notImplemented("ManagedSettings configuration not implemented in demo")
+        #else
+        // Simulator/macOS implementation - log the operation
+        print("DEVELOPMENT: Would allocate \(timeMinutes) minutes for redemption \(redemptionID)")
         #endif
     }
 
@@ -188,11 +322,11 @@ public class FamilyControlsService: ObservableObject {
         // 2. Clear application restrictions
         // 3. Clean up metadata
 
-        #if targetEnvironment(simulator)
-        print("SIMULATOR: Would remove reward time settings for redemption \(redemptionID)")
-        #else
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
         // Device implementation would use actual ManagedSettings APIs
         throw FamilyControlsError.notImplemented("ManagedSettings removal not implemented in demo")
+        #else
+        print("DEVELOPMENT: Would remove reward time settings for redemption \(redemptionID)")
         #endif
     }
 }
@@ -299,5 +433,3 @@ extension RewardTimeAllocationResult {
         }
     }
 }
-
-#endif

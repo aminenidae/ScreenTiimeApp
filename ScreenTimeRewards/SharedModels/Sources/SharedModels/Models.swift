@@ -360,7 +360,191 @@ public struct SubscriptionEntitlement: Codable, Identifiable {
     }
 }
 
+// MARK: - Educational Goals Models
+
+public enum GoalType: Codable, Equatable {
+    case timeBased(hours: Int)
+    case pointBased(points: Int)
+    case appSpecific(bundleID: String, hours: Int)
+    case streak(days: Int)
+}
+
+public enum GoalFrequency: String, Codable, Equatable {
+    case daily = "daily"
+    case weekly = "weekly"
+    case monthly = "monthly"
+    case custom = "custom"
+}
+
+public enum GoalStatus: String, Codable, Equatable {
+    case notStarted = "notStarted"
+    case inProgress = "inProgress"
+    case completed = "completed"
+    case failed = "failed"
+}
+
+public struct GoalMetadata: Codable, Equatable {
+    public var createdBy: String  // Parent user ID
+    public var lastModifiedAt: Date
+    public var lastModifiedBy: String
+    public var completedAt: Date?
+    public var failedAt: Date?
+
+    public init(
+        createdBy: String,
+        lastModifiedAt: Date = Date(),
+        lastModifiedBy: String,
+        completedAt: Date? = nil,
+        failedAt: Date? = nil
+    ) {
+        self.createdBy = createdBy
+        self.lastModifiedAt = lastModifiedAt
+        self.lastModifiedBy = lastModifiedBy
+        self.completedAt = completedAt
+        self.failedAt = failedAt
+    }
+}
+
+public struct EducationalGoal: Codable, Equatable, Identifiable {
+    public let id: UUID
+    public let childProfileID: String
+    public var title: String
+    public var description: String
+    public var type: GoalType
+    public var frequency: GoalFrequency
+    public var targetValue: Double
+    public var currentValue: Double
+    public var startDate: Date
+    public var endDate: Date
+    public var createdAt: Date
+    public var status: GoalStatus
+    public var isRecurring: Bool
+    public var metadata: GoalMetadata
+
+    public init(
+        id: UUID = UUID(),
+        childProfileID: String,
+        title: String,
+        description: String,
+        type: GoalType,
+        frequency: GoalFrequency,
+        targetValue: Double,
+        currentValue: Double,
+        startDate: Date,
+        endDate: Date,
+        createdAt: Date = Date(),
+        status: GoalStatus,
+        isRecurring: Bool,
+        metadata: GoalMetadata
+    ) {
+        self.id = id
+        self.childProfileID = childProfileID
+        self.title = title
+        self.description = description
+        self.type = type
+        self.frequency = frequency
+        self.targetValue = targetValue
+        self.currentValue = currentValue
+        self.startDate = startDate
+        self.endDate = endDate
+        self.createdAt = createdAt
+        self.status = status
+        self.isRecurring = isRecurring
+        self.metadata = metadata
+    }
+}
+
+// MARK: - Achievement Badge Models
+
+public enum BadgeType: String, Codable, Equatable {
+    case streak = "streak"
+    case points = "points"
+    case time = "time"
+    case appSpecific = "appSpecific"
+    case milestone = "milestone"
+    case custom = "custom"
+}
+
+public enum MilestoneType: String, Codable, Equatable {
+    case firstGoalCompleted = "firstGoalCompleted"
+    case hundredPoints = "hundredPoints"
+    case tenHoursLearning = "tenHoursLearning"
+    case oneWeekStreak = "oneWeekStreak"
+    case fiveGoalsCompleted = "fiveGoalsCompleted"
+    case custom = "custom"
+}
+
+public struct BadgeMetadata: Codable, Equatable {
+    public var relatedGoalID: UUID?
+    public var relatedSessionIDs: [UUID]?
+    public var pointsAwarded: Int?  // Optional bonus points for earning badge
+
+    public init(
+        relatedGoalID: UUID? = nil,
+        relatedSessionIDs: [UUID]? = nil,
+        pointsAwarded: Int? = nil
+    ) {
+        self.relatedGoalID = relatedGoalID
+        self.relatedSessionIDs = relatedSessionIDs
+        self.pointsAwarded = pointsAwarded
+    }
+}
+
+public struct AchievementBadge: Codable, Equatable, Identifiable {
+    public let id: UUID
+    public let childProfileID: String
+    public var type: BadgeType
+    public var title: String
+    public var description: String
+    public var earnedAt: Date
+    public var icon: String  // SF Symbol name or asset name
+    public var isRare: Bool
+    public var metadata: BadgeMetadata
+
+    public init(
+        id: UUID = UUID(),
+        childProfileID: String,
+        type: BadgeType,
+        title: String,
+        description: String,
+        earnedAt: Date,
+        icon: String,
+        isRare: Bool,
+        metadata: BadgeMetadata
+    ) {
+        self.id = id
+        self.childProfileID = childProfileID
+        self.type = type
+        self.title = title
+        self.description = description
+        self.earnedAt = earnedAt
+        self.icon = icon
+        self.isRare = isRare
+        self.metadata = metadata
+    }
+}
+
 // MARK: - Repository Protocols
+
+@available(iOS 15.0, macOS 10.15, *)
+public protocol EducationalGoalRepository {
+    func createGoal(_ goal: EducationalGoal) async throws -> EducationalGoal
+    func save(_ goal: EducationalGoal) async throws -> EducationalGoal
+    func fetchGoal(id: UUID) async throws -> EducationalGoal?
+    func fetchGoals(for childID: String) async throws -> [EducationalGoal]
+    func updateGoal(_ goal: EducationalGoal) async throws -> EducationalGoal
+    func delete(_ goalID: UUID) async throws
+}
+
+@available(iOS 15.0, macOS 10.15, *)
+public protocol AchievementBadgeRepository {
+    func createBadge(_ badge: AchievementBadge) async throws -> AchievementBadge
+    func save(_ badge: AchievementBadge) async throws -> AchievementBadge
+    func fetchBadge(id: UUID) async throws -> AchievementBadge?
+    func fetchBadges(for childID: String) async throws -> [AchievementBadge]
+    func updateBadge(_ badge: AchievementBadge) async throws -> AchievementBadge
+    func delete(_ badgeID: UUID) async throws
+}
 
 @available(iOS 15.0, macOS 10.15, *)
 public protocol FamilyRepository {
