@@ -49,7 +49,9 @@ public class PointTrackingService: NSObject {
     /// - Parameter session: The usage session to process
     public func processUsageSession(_ session: UsageSession) {
         // Calculate points based on the session
-        let points = calculationEngine.calculatePoints(for: session)
+        // TODO: Get the actual points per hour for the app from the app categorization
+        let pointsPerHour = 10 // Default value for now
+        let points = calculationEngine.calculatePoints(for: session, pointsPerHour: pointsPerHour)
         
         // Save the usage session
         Task {

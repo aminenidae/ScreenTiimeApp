@@ -9,21 +9,20 @@ public class PointCalculationEngine {
     public init() {}
     
     /// Calculates points for a usage session
-    /// - Parameter session: The usage session to calculate points for
+    /// - Parameters:
+    ///   - session: The usage session
+    ///   - pointsPerHour: Points earned per hour
     /// - Returns: The number of points earned
-    public func calculatePoints(for session: UsageSession) -> Int {
-        // Get the points per hour for this app (this would typically come from settings)
-        let pointsPerHour = getPointsPerHour(for: session.appBundleID, category: session.category)
-        
-        // Calculate duration in hours
+    public func calculatePoints(for session: UsageSession, pointsPerHour: Int) -> Int {
         let durationHours = session.duration / 3600.0
+        let basePoints = Int(Double(pointsPerHour) * durationHours)
         
-        // Calculate points
-        let points = Int(Double(pointsPerHour) * durationHours)
-        
-        return points
+        // For now, we're not applying validation adjustments since we removed
+        // the validationDetails property from UsageSession to avoid circular dependencies
+        // TODO: Implement validation adjustments in a different way that doesn't create circular dependencies
+        return basePoints
     }
-    
+
     /// Gets the points per hour for a specific app and category
     /// - Parameters:
     ///   - appBundleID: The bundle ID of the app

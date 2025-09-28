@@ -1,9 +1,11 @@
 import SwiftUI
 import SharedModels
 import DesignSystem
+import RewardCore
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
+    @State private var notificationSettingsViewModel: NotificationSettingsViewModel?
 
     var body: some View {
         NavigationView {
@@ -21,6 +23,10 @@ struct SettingsView: View {
             }
             .task {
                 await viewModel.loadSettings()
+                // Initialize notification settings view model when we have a child profile
+                if let settings = viewModel.settings {
+                    notificationSettingsViewModel = NotificationSettingsViewModel(childProfileID: settings.id)
+                }
             }
             .alert("Save Error", isPresented: $viewModel.showError) {
                 Button("OK") { }
@@ -41,6 +47,11 @@ struct SettingsView: View {
 
                 // App Restrictions Section
                 appRestrictionsSection
+
+                // Notification Settings Section
+                if let notificationVM = notificationSettingsViewModel {
+                    notificationSettingsSection(viewModel: notificationVM)
+                }
 
                 // Save Status Section
                 saveStatusSection
@@ -91,6 +102,22 @@ struct SettingsView: View {
                     set: { viewModel.updateContentRestrictions($0) }
                 )
             )
+        }
+    }
+
+    private func notificationSettingsSection(viewModel: NotificationSettingsViewModel) -> some View {
+        SettingsSection(title: "Notifications", icon: "bell.fill", iconColor: .red) {
+            NavigationLink(destination: NotificationSettingsView(viewModel: viewModel)) {
+                HStack {
+                    Text("Manage notification preferences")
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(.secondary)
+                }
+            }
         }
     }
 

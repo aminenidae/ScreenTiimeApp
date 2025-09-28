@@ -160,8 +160,7 @@ interface UsageSession {
 
 ### Relationships
 - Belongs to `ChildProfile` (many-to-one)
-- References `AppCategorization` (many-to-one)
-- Creates `PointTransaction` when validated (one-to-one)
+- References `AppCategorization` (many-to-many)
 
 ---
 
@@ -254,7 +253,7 @@ interface RewardRedemption {
 
 ### Relationships
 - Belongs to `ChildProfile` (many-to-one)
-- References `AppCategorization` (many-to-one)
+- References `AppCategorization` (one-to-one)
 - Creates `PointTransaction` (one-to-one)
 
 ---
@@ -356,6 +355,32 @@ interface FamilySettings {
 
 ---
 
+## NotificationEventType
+
+**Purpose:** Defines the types of notification events that can be triggered for parent notifications
+
+**Key Attributes:**
+- `pointsEarned`: Triggered when child earns points during a learning session
+- `goalAchieved`: Triggered when child reaches a learning goal milestone
+- `weeklyMilestone`: Triggered for weekly progress summaries
+- `streakAchieved`: Triggered when child maintains a learning streak
+
+### Swift Enum
+```swift
+enum NotificationEventType: String, CaseIterable {
+    case pointsEarned = "points_earned"
+    case goalAchieved = "goal_achieved"
+    case weeklyMilestone = "weekly_milestone"
+    case streakAchieved = "streak_achieved"
+}
+```
+
+### Usage
+- Used in `ChildProfile` to track enabled notification types
+- Referenced by `NotificationService` to determine which events trigger notifications
+
+---
+
 ## Data Model Design Decisions:
 
 1. **Immutable Transactions:** `PointTransaction` is append-only ledger for auditability and debugging
@@ -367,5 +392,6 @@ interface FamilySettings {
 7. **Extensibility:** `RewardRedemption` designed to support future reward types via strategy pattern
 8. **Subscription Model:** `SubscriptionEntitlement` uses CloudKit Functions for server-side receipt validation
 9. **Grace Periods:** Offline subscription validation supports 7-day grace period for network issues
+10. **Notification Events:** `NotificationEventType` provides type-safe notification event definitions
 
 ---

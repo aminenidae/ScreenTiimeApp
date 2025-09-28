@@ -42,8 +42,10 @@ public struct ChildProfile: Codable, Identifiable {
     public var ageVerified: Bool
     public var verificationMethod: String?
     public var dataRetentionPeriod: Int? // In days
+    // Notification preferences
+    public var notificationPreferences: NotificationPreferences?
     
-    public init(id: String, familyID: String, name: String, avatarAssetURL: String?, birthDate: Date, pointBalance: Int, totalPointsEarned: Int = 0, deviceID: String? = nil, cloudKitZoneID: String? = nil, createdAt: Date = Date(), ageVerified: Bool = false, verificationMethod: String? = nil, dataRetentionPeriod: Int? = nil) {
+    public init(id: String, familyID: String, name: String, avatarAssetURL: String?, birthDate: Date, pointBalance: Int, totalPointsEarned: Int = 0, deviceID: String? = nil, cloudKitZoneID: String? = nil, createdAt: Date = Date(), ageVerified: Bool = false, verificationMethod: String? = nil, dataRetentionPeriod: Int? = nil, notificationPreferences: NotificationPreferences? = nil) {
         self.id = id
         self.familyID = familyID
         self.name = name
@@ -57,6 +59,7 @@ public struct ChildProfile: Codable, Identifiable {
         self.ageVerified = ageVerified
         self.verificationMethod = verificationMethod
         self.dataRetentionPeriod = dataRetentionPeriod
+        self.notificationPreferences = notificationPreferences
     }
 }
 
@@ -162,8 +165,10 @@ public struct UsageSession: Codable, Identifiable {
     public let startTime: Date
     public let endTime: Date
     public let duration: TimeInterval
+    // Validation fields (removed to avoid circular dependency)
+    public let isValidated: Bool
     
-    public init(id: String, childProfileID: String, appBundleID: String, category: AppCategory, startTime: Date, endTime: Date, duration: TimeInterval) {
+    public init(id: String, childProfileID: String, appBundleID: String, category: AppCategory, startTime: Date, endTime: Date, duration: TimeInterval, isValidated: Bool = false) {
         self.id = id
         self.childProfileID = childProfileID
         self.appBundleID = appBundleID
@@ -171,6 +176,7 @@ public struct UsageSession: Codable, Identifiable {
         self.startTime = startTime
         self.endTime = endTime
         self.duration = duration
+        self.isValidated = isValidated
     }
 }
 
@@ -638,3 +644,43 @@ public struct DateRange: Codable {
         self.end = end
     }
 }
+
+public struct NotificationPreferences: Codable {
+    public var enabledNotifications: Set<NotificationEvent>
+    public var quietHoursStart: Date?
+    public var quietHoursEnd: Date?
+    public var digestMode: Bool
+    public var lastNotificationSent: Date?
+    public var notificationsEnabled: Bool
+    
+    public init(
+        enabledNotifications: Set<NotificationEvent> = Set(NotificationEvent.allCases),
+        quietHoursStart: Date? = nil,
+        quietHoursEnd: Date? = nil,
+        digestMode: Bool = false,
+        lastNotificationSent: Date? = nil,
+        notificationsEnabled: Bool = true
+    ) {
+        self.enabledNotifications = enabledNotifications
+        self.quietHoursStart = quietHoursStart
+        self.quietHoursEnd = quietHoursEnd
+        self.digestMode = digestMode
+        self.lastNotificationSent = lastNotificationSent
+        self.notificationsEnabled = notificationsEnabled
+    }
+}
+
+public enum NotificationEvent: String, CaseIterable, Codable {
+    case pointsEarned = "points_earned"
+    case goalAchieved = "goal_achieved"
+    case weeklyMilestone = "weekly_milestone"
+    case streakAchieved = "streak_achieved"
+}
+
+// MARK: - Validation Models (Moved from RewardCore to avoid circular dependency)
+
+// MARK: - Validation Models (Removed from here to avoid circular dependency)
+// These models have been moved back to RewardCore module
+
+// MARK: - Validation Models (Removed from here to avoid circular dependency)
+// These models have been moved back to RewardCore module
