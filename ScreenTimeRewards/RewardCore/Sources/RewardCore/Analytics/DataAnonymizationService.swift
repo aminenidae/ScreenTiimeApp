@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import SharedModels
 
 // MARK: - Data Anonymization Service
@@ -17,10 +18,11 @@ public class DataAnonymizationService: @unchecked Sendable {
     
     /// Anonymizes a user ID using SHA-256 hashing with app-specific salt
     public func anonymize(userID: String) -> String {
-        // In a real implementation, you would use a proper cryptographic hash function
-        // For this example, we'll use a simple approach
         let input = userID + salt
-        return String(input.reversed()) // Simple placeholder for hashing
+        let data = input.data(using: .utf8)!
+        let hash = SHA256.hash(data: data)
+        let hashString = hash.compactMap { String(format: "%02x", $0) }.joined()
+        return "anon_" + hashString.prefix(32)
     }
     
     /// Anonymizes a device model to protect device identity
@@ -42,7 +44,7 @@ public class DataAnonymizationService: @unchecked Sendable {
             eventType: event.eventType,
             timestamp: event.timestamp,
             anonymizedUserID: anonymize(userID: event.anonymizedUserID),
-            sessionID: sessionID,
+            sessionID: event.sessionID, // Preserve original session ID
             appVersion: event.appVersion,
             osVersion: event.osVersion,
             deviceModel: anonymize(deviceModel: event.deviceModel),

@@ -54,8 +54,8 @@ struct SettingsView: View {
                 // App Restrictions Section
                 appRestrictionsSection
 
-                // Trial Status Section (if applicable)
-                trialStatusSection
+                // Subscription Management Section
+                subscriptionSection
 
                 // Notification Settings Section
                 if let notificationVM = notificationSettingsViewModel {
@@ -202,10 +202,26 @@ struct SettingsView: View {
     }
 
     @available(iOS 15.0, *)
-    private var trialStatusSection: some View {
+    private var subscriptionSection: some View {
         SettingsSection(title: "Subscription", icon: "crown.fill", iconColor: .purple) {
-            // Mock family repository for now - in real implementation, this would come from app state
-            TrialStatusView(familyID: "current-family-id", familyRepository: CloudKitService.shared)
+            NavigationLink(destination: SubscriptionDetailsView(familyID: viewModel.settings?.familyID)) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Manage Subscription")
+                            .foregroundColor(.primary)
+                            .font(.body)
+
+                        Text("View billing, change plans, or cancel")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(.secondary)
+                }
+            }
         }
     }
 

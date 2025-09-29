@@ -15,8 +15,10 @@ public struct Family: Codable, Identifiable {
     public var parentalConsentMethod: String?
     // Trial and subscription metadata
     public var subscriptionMetadata: SubscriptionMetadata?
+    // Real-time subscription status synchronized from StoreKit
+    public var subscriptionStatus: SubscriptionStatus?
 
-    public init(id: String, name: String, createdAt: Date, ownerUserID: String, sharedWithUserIDs: [String], childProfileIDs: [String], parentalConsentGiven: Bool = false, parentalConsentDate: Date? = nil, parentalConsentMethod: String? = nil, subscriptionMetadata: SubscriptionMetadata? = nil) {
+    public init(id: String, name: String, createdAt: Date, ownerUserID: String, sharedWithUserIDs: [String], childProfileIDs: [String], parentalConsentGiven: Bool = false, parentalConsentDate: Date? = nil, parentalConsentMethod: String? = nil, subscriptionMetadata: SubscriptionMetadata? = nil, subscriptionStatus: SubscriptionStatus? = nil) {
         self.id = id
         self.name = name
         self.createdAt = createdAt
@@ -27,7 +29,18 @@ public struct Family: Codable, Identifiable {
         self.parentalConsentDate = parentalConsentDate
         self.parentalConsentMethod = parentalConsentMethod
         self.subscriptionMetadata = subscriptionMetadata
+        self.subscriptionStatus = subscriptionStatus
     }
+}
+
+// MARK: - Subscription Status Enum
+
+public enum SubscriptionStatus: String, Codable, CaseIterable {
+    case active = "active"           // Paid and current
+    case trial = "trial"             // In free trial period
+    case expired = "expired"         // Lapsed subscription
+    case gracePeriod = "gracePeriod" // Payment issue, retrying
+    case revoked = "revoked"         // Refunded or cancelled
 }
 
 public struct ChildProfile: Codable, Identifiable {

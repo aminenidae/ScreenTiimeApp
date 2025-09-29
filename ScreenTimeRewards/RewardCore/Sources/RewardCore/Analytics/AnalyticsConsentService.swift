@@ -64,8 +64,8 @@ public class AnalyticsConsentService: @unchecked Sendable {
             return consent.consentLevel
         }
         
-        // Default to detailed consent if no explicit consent has been given
-        return .detailed
+        // Default to no consent if no explicit consent has been given
+        return .none
     }
     
     /// Checks if analytics collection is allowed for a user based on their consent level
