@@ -13,8 +13,10 @@ public struct Family: Codable, Identifiable {
     public var parentalConsentGiven: Bool
     public var parentalConsentDate: Date?
     public var parentalConsentMethod: String?
-    
-    public init(id: String, name: String, createdAt: Date, ownerUserID: String, sharedWithUserIDs: [String], childProfileIDs: [String], parentalConsentGiven: Bool = false, parentalConsentDate: Date? = nil, parentalConsentMethod: String? = nil) {
+    // Trial and subscription metadata
+    public var subscriptionMetadata: SubscriptionMetadata?
+
+    public init(id: String, name: String, createdAt: Date, ownerUserID: String, sharedWithUserIDs: [String], childProfileIDs: [String], parentalConsentGiven: Bool = false, parentalConsentDate: Date? = nil, parentalConsentMethod: String? = nil, subscriptionMetadata: SubscriptionMetadata? = nil) {
         self.id = id
         self.name = name
         self.createdAt = createdAt
@@ -24,6 +26,7 @@ public struct Family: Codable, Identifiable {
         self.parentalConsentGiven = parentalConsentGiven
         self.parentalConsentDate = parentalConsentDate
         self.parentalConsentMethod = parentalConsentMethod
+        self.subscriptionMetadata = subscriptionMetadata
     }
 }
 
@@ -348,6 +351,31 @@ public struct FamilySettings: Codable, Identifiable {
     }
 }
 
+public struct SubscriptionMetadata: Codable {
+    public var trialStartDate: Date?
+    public var trialEndDate: Date?
+    public var hasUsedTrial: Bool
+    public var subscriptionStartDate: Date?
+    public var subscriptionEndDate: Date?
+    public var isActive: Bool
+
+    public init(
+        trialStartDate: Date? = nil,
+        trialEndDate: Date? = nil,
+        hasUsedTrial: Bool = false,
+        subscriptionStartDate: Date? = nil,
+        subscriptionEndDate: Date? = nil,
+        isActive: Bool = false
+    ) {
+        self.trialStartDate = trialStartDate
+        self.trialEndDate = trialEndDate
+        self.hasUsedTrial = hasUsedTrial
+        self.subscriptionStartDate = subscriptionStartDate
+        self.subscriptionEndDate = subscriptionEndDate
+        self.isActive = isActive
+    }
+}
+
 public struct SubscriptionEntitlement: Codable, Identifiable {
     public let id: String
     public let familyID: String
@@ -355,7 +383,7 @@ public struct SubscriptionEntitlement: Codable, Identifiable {
     public let startDate: Date
     public let endDate: Date
     public let isActive: Bool
-    
+
     public init(id: String, familyID: String, subscriptionType: String, startDate: Date, endDate: Date, isActive: Bool) {
         self.id = id
         self.familyID = familyID

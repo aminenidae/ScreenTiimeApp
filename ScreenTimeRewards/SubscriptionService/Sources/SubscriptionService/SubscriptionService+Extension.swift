@@ -1,4 +1,5 @@
 import Foundation
+import SharedModels
 
 // MARK: - SubscriptionService Public Interface
 
@@ -60,5 +61,22 @@ extension SubscriptionService {
             return 2
         }
         return 1 // Default to 1 child
+    }
+
+    /// Create a trial eligibility service instance
+    public func createTrialEligibilityService(familyRepository: FamilyRepository) -> TrialEligibilityService {
+        return TrialEligibilityService(familyRepository: familyRepository)
+    }
+
+    /// Check if family is eligible for trial
+    public func checkTrialEligibility(for familyID: String, using familyRepository: FamilyRepository) async -> TrialEligibilityResult {
+        let trialService = createTrialEligibilityService(familyRepository: familyRepository)
+        return await trialService.checkTrialEligibility(for: familyID)
+    }
+
+    /// Activate trial for family
+    public func activateTrial(for familyID: String, using familyRepository: FamilyRepository) async -> TrialActivationResult {
+        let trialService = createTrialEligibilityService(familyRepository: familyRepository)
+        return await trialService.activateTrial(for: familyID)
     }
 }

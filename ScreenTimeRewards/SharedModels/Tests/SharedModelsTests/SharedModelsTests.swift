@@ -89,4 +89,60 @@ final class SharedModelsTests: XCTestCase {
         
         XCTAssertEqual(appCategorization, decodedAppCategorization)
     }
+
+    func testSubscriptionMetadataInitialization() {
+        let metadata = SubscriptionMetadata()
+
+        XCTAssertNil(metadata.trialStartDate)
+        XCTAssertNil(metadata.trialEndDate)
+        XCTAssertFalse(metadata.hasUsedTrial)
+        XCTAssertNil(metadata.subscriptionStartDate)
+        XCTAssertNil(metadata.subscriptionEndDate)
+        XCTAssertFalse(metadata.isActive)
+    }
+
+    func testSubscriptionMetadataWithTrialData() {
+        let trialStart = Date()
+        let trialEnd = Calendar.current.date(byAdding: .day, value: 14, to: trialStart)!
+
+        let metadata = SubscriptionMetadata(
+            trialStartDate: trialStart,
+            trialEndDate: trialEnd,
+            hasUsedTrial: true
+        )
+
+        XCTAssertEqual(metadata.trialStartDate, trialStart)
+        XCTAssertEqual(metadata.trialEndDate, trialEnd)
+        XCTAssertTrue(metadata.hasUsedTrial)
+        XCTAssertFalse(metadata.isActive)
+    }
+
+    func testFamilyWithSubscriptionMetadata() throws {
+        let metadata = SubscriptionMetadata(
+            trialStartDate: Date(),
+            trialEndDate: Calendar.current.date(byAdding: .day, value: 14, to: Date())!,
+            hasUsedTrial: true
+        )
+
+        let family = Family(
+            id: "family1",
+            name: "Test Family",
+            createdAt: Date(),
+            ownerUserID: "user1",
+            sharedWithUserIDs: [],
+            childProfileIDs: [],
+            subscriptionMetadata: metadata
+        )
+
+        XCTAssertNotNil(family.subscriptionMetadata)
+        XCTAssertTrue(family.subscriptionMetadata?.hasUsedTrial ?? false)
+
+        // Test Codable
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(family)
+        let decodedFamily = try JSONDecoder().decode(Family.self, from: data)
+
+        XCTAssertEqual(family.id, decodedFamily.id)
+        XCTAssertEqual(family.subscriptionMetadata?.hasUsedTrial, decodedFamily.subscriptionMetadata?.hasUsedTrial)
+    }
 }

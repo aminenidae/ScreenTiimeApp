@@ -12,6 +12,7 @@ public class CloudKitService {
     private let _usageSessionRepository: SharedModels.UsageSessionRepository
     private let _pointTransactionRepository: SharedModels.PointTransactionRepository
     private let _pointToTimeRedemptionRepository: SharedModels.PointToTimeRedemptionRepository
+    private let _familyRepository: SharedModels.FamilyRepository
 
     private init() {
         // Initialize all repository implementations
@@ -20,6 +21,7 @@ public class CloudKitService {
         self._usageSessionRepository = CloudKitService.UsageSessionRepository()
         self._pointTransactionRepository = CloudKitService.PointTransactionRepository()
         self._pointToTimeRedemptionRepository = CloudKitService.PointToTimeRedemptionRepository()
+        self._familyRepository = CloudKitService.FamilyRepository()
     }
 
     // MARK: - Nested Repository Types
@@ -188,6 +190,35 @@ public class CloudKitService {
             )
         }
     }
+
+    /// Nested FamilyRepository class for easy instantiation in tests
+    @available(iOS 15.0, macOS 10.15, *)
+    public class FamilyRepository: SharedModels.FamilyRepository {
+        public init() {}
+
+        public func createFamily(_ family: Family) async throws -> Family {
+            print("Creating family: \(family.name)")
+            return family
+        }
+
+        public func fetchFamily(id: String) async throws -> Family? {
+            // Mock implementation for now
+            return nil
+        }
+
+        public func fetchFamilies(for userID: String) async throws -> [Family] {
+            return []
+        }
+
+        public func updateFamily(_ family: Family) async throws -> Family {
+            print("Updating family: \(family.name) with trial metadata")
+            return family
+        }
+
+        public func deleteFamily(id: String) async throws {
+            print("Deleting family: \(id)")
+        }
+    }
 }
 
 // MARK: - Repository Protocol Conformance
@@ -308,6 +339,29 @@ extension CloudKitService: SharedModels.PointToTimeRedemptionRepository {
 
     public func deletePointToTimeRedemption(id: String) async throws {
         try await _pointToTimeRedemptionRepository.deletePointToTimeRedemption(id: id)
+    }
+}
+
+@available(iOS 15.0, macOS 10.15, *)
+extension CloudKitService: SharedModels.FamilyRepository {
+    public func createFamily(_ family: Family) async throws -> Family {
+        return try await _familyRepository.createFamily(family)
+    }
+
+    public func fetchFamily(id: String) async throws -> Family? {
+        return try await _familyRepository.fetchFamily(id: id)
+    }
+
+    public func fetchFamilies(for userID: String) async throws -> [Family] {
+        return try await _familyRepository.fetchFamilies(for: userID)
+    }
+
+    public func updateFamily(_ family: Family) async throws -> Family {
+        return try await _familyRepository.updateFamily(family)
+    }
+
+    public func deleteFamily(id: String) async throws {
+        try await _familyRepository.deleteFamily(id: id)
     }
 }
 

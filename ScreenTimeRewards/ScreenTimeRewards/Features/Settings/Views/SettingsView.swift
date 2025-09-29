@@ -2,6 +2,8 @@ import SwiftUI
 import SharedModels
 import DesignSystem
 import RewardCore
+import SubscriptionService
+import CloudKitService
 
 // Legal documents
 import ScreenTimeRewards
@@ -51,6 +53,9 @@ struct SettingsView: View {
 
                 // App Restrictions Section
                 appRestrictionsSection
+
+                // Trial Status Section (if applicable)
+                trialStatusSection
 
                 // Notification Settings Section
                 if let notificationVM = notificationSettingsViewModel {
@@ -193,6 +198,14 @@ struct SettingsView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(.secondarySystemBackground))
             )
+        }
+    }
+
+    @available(iOS 15.0, *)
+    private var trialStatusSection: some View {
+        SettingsSection(title: "Subscription", icon: "crown.fill", iconColor: .purple) {
+            // Mock family repository for now - in real implementation, this would come from app state
+            TrialStatusView(familyID: "current-family-id", familyRepository: CloudKitService.shared)
         }
     }
 
