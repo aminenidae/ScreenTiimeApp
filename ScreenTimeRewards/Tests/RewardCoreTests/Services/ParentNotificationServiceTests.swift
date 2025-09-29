@@ -24,6 +24,21 @@ final class ParentNotificationServiceTests: XCTestCase {
         mockNotificationCenter = nil
         super.tearDown()
     }
+
+    private func createTestFamily(id: String) -> Family {
+        return Family(
+            id: id,
+            name: "Test Family",
+            createdAt: Date(),
+            ownerUserID: "user-1",
+            sharedWithUserIDs: [],
+            childProfileIDs: ["child-1"],
+            parentalConsentGiven: false,
+            parentalConsentDate: nil,
+            parentalConsentMethod: nil,
+            subscriptionMetadata: nil
+        )
+    }
     
     func testNotifyParentsOfSuspiciousSession() async {
         // Create a suspicious validation result
@@ -56,14 +71,7 @@ final class ParentNotificationServiceTests: XCTestCase {
         )
         
         // Set up mock family
-        mockFamilyRepository.mockFamily = Family(
-            id: "family-1",
-            name: "Test Family",
-            createdAt: Date(),
-            ownerUserID: "user-1",
-            sharedWithUserIDs: [],
-            childProfileIDs: ["child-1"]
-        )
+        mockFamilyRepository.mockFamily = createTestFamily(id: "family-1")
         
         // Call the notification method
         await notificationService.notifyParents(of: validationResult, for: session, familyID: "family-1")
@@ -115,14 +123,7 @@ final class ParentNotificationServiceTests: XCTestCase {
         )
         
         // Set up mock family
-        mockFamilyRepository.mockFamily = Family(
-            id: "family-1",
-            name: "Test Family",
-            createdAt: Date(),
-            ownerUserID: "user-1",
-            sharedWithUserIDs: [],
-            childProfileIDs: ["child-1"]
-        )
+        mockFamilyRepository.mockFamily = createTestFamily(id: "family-1")
         
         // Call the notification method
         await notificationService.notifyParents(of: validationResult, for: session, familyID: "family-1")
