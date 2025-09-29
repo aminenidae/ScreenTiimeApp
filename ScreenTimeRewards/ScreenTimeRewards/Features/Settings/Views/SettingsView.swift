@@ -3,6 +3,10 @@ import SharedModels
 import DesignSystem
 import RewardCore
 
+// Legal documents
+import ScreenTimeRewards
+
+
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
     @State private var notificationSettingsViewModel: NotificationSettingsViewModel?
@@ -52,6 +56,9 @@ struct SettingsView: View {
                 if let notificationVM = notificationSettingsViewModel {
                     notificationSettingsSection(viewModel: notificationVM)
                 }
+
+                // Legal Section
+                legalSection
 
                 // Save Status Section
                 saveStatusSection
@@ -116,6 +123,38 @@ struct SettingsView: View {
                     
                     Image(systemName: "chevron.right")
                         .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
+
+    private var legalSection: some View {
+        SettingsSection(title: "Legal", icon: "doc.fill", iconColor: .gray) {
+            VStack(spacing: 16) {
+                NavigationLink(destination: PrivacyPolicyView()) {
+                    HStack {
+                        Text("Privacy Policy")
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Divider()
+                
+                NavigationLink(destination: TermsOfServiceView()) {
+                    HStack {
+                        Text("Terms of Service")
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
         }

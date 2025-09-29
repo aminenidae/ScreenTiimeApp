@@ -276,32 +276,41 @@ final class NotificationServiceTests: XCTestCase {
 
 // MARK: - Mock UNUserNotificationCenter
 
-class MockUNUserNotificationCenter: UNUserNotificationCenter {
+class MockUNUserNotificationCenter: UNUserNotificationCenterProtocol {
     var authorizationResult: Bool = false
     var requestAuthorizationCalled = false
     var addCalled = false
     var addedRequests: [UNNotificationRequest] = []
     var removeAllPendingCalled = false
     var removeAllDeliveredCalled = false
-    
-    override func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
+
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
         requestAuthorizationCalled = true
         return authorizationResult
     }
-    
-    override func add(_ request: UNNotificationRequest) async throws {
+
+    func add(_ request: UNNotificationRequest) async throws {
         addCalled = true
-        var mutableRequest = request
+        let mutableRequest = request
         // Hack to make the identifier testable (UNNotificationRequest's identifier is read-only)
         addedRequests.append(mutableRequest)
     }
-    
-    override func removeAllPendingNotificationRequests() {
+
+    func removeAllPendingNotificationRequests() async {
         removeAllPendingCalled = true
     }
-    
-    override func removeAllDeliveredNotifications() {
+
+    func removeAllDeliveredNotifications() async {
         removeAllDeliveredCalled = true
+    }
+
+    func requestAuthorization(options: UNAuthorizationOptions, completionHandler: @escaping (Bool, Error?) -> Void) {
+        requestAuthorizationCalled = true
+        completionHandler(authorizationResult, nil)
+    }
+
+    func checkAuthorizationStatus(completionHandler: @escaping (Bool) -> Void) {
+        completionHandler(authorizationResult)
     }
 }
 

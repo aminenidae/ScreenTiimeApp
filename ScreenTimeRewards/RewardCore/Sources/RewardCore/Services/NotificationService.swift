@@ -42,11 +42,28 @@ public protocol NotificationServiceProtocol {
     func getPreferences(for childProfileID: String) async throws -> NotificationPreferences
 }
 
+public protocol UNUserNotificationCenterProtocol {
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
+    func add(_ request: UNNotificationRequest) async throws
+    func removeAllPendingNotificationRequests() async
+    func removeAllDeliveredNotifications() async
+    func requestAuthorization(options: UNAuthorizationOptions, completionHandler: @escaping (Bool, Error?) -> Void)
+    func checkAuthorizationStatus(completionHandler: @escaping (Bool) -> Void)
+}
+
+extension UNUserNotificationCenter: UNUserNotificationCenterProtocol {
+    public func checkAuthorizationStatus(completionHandler: @escaping (Bool) -> Void) {
+        getNotificationSettings { settings in
+            completionHandler(settings.authorizationStatus == .authorized)
+        }
+    }
+}
+
 public class NotificationService: NotificationServiceProtocol {
-    private let notificationCenter: UNUserNotificationCenter
+    private let notificationCenter: UNUserNotificationCenterProtocol
     private var preferencesCache: [String: NotificationPreferences] = [:]
-    
-    public init(notificationCenter: UNUserNotificationCenter = UNUserNotificationCenter.current()) {
+
+    public init(notificationCenter: UNUserNotificationCenterProtocol = UNUserNotificationCenter.current()) {
         self.notificationCenter = notificationCenter
     }
     

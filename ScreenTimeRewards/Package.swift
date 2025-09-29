@@ -14,7 +14,8 @@ let package = Package(
         .library(name: "CloudKitService", targets: ["CloudKitService"]),
         .library(name: "FamilyControlsKit", targets: ["FamilyControlsKit"]),
         .library(name: "RewardCore", targets: ["RewardCore"]),
-        .library(name: "DesignSystem", targets: ["DesignSystem"])
+        .library(name: "DesignSystem", targets: ["DesignSystem"]),
+        .library(name: "SubscriptionService", targets: ["SubscriptionService"])
     ],
     dependencies: [
         // Code quality tools for development
@@ -80,6 +81,18 @@ let package = Package(
             name: "DesignSystemTests",
             dependencies: ["DesignSystem"],
             path: "DesignSystem/Tests/DesignSystemTests"
+        ),
+
+        // SubscriptionService
+        .target(
+            name: "SubscriptionService",
+            dependencies: ["SharedModels"],
+            path: "SubscriptionService/Sources/SubscriptionService"
+        ),
+        .testTarget(
+            name: "SubscriptionServiceTests",
+            dependencies: ["SubscriptionService"],
+            path: "SubscriptionService/Tests/SubscriptionServiceTests"
         )
     ]
 )

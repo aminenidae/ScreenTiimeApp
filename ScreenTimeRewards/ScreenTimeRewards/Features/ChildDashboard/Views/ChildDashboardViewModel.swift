@@ -3,6 +3,8 @@ import SwiftUI
 import Combine
 import SharedModels
 import CloudKitService
+import RewardCore
+import OSLog
 
 @MainActor
 class ChildDashboardViewModel: ObservableObject {
@@ -12,7 +14,13 @@ class ChildDashboardViewModel: ObservableObject {
     @Published var recentSessions: [ScreenTimeSession] = []
     @Published var pointsAnimationScale: CGFloat = 1.0
     @Published var isLoading: Bool = false
+
+    // Enhanced error handling properties
     @Published var errorMessage: String?
+    @Published var showError: Bool = false
+    @Published var currentError: AppError?
+    @Published var canRetry: Bool = false
+
     @Published var dailyGoal: Int = 100
     @Published var availableRewards: [Reward] = []
     @Published var floatingPointsNotification: Int = 0
@@ -21,6 +29,8 @@ class ChildDashboardViewModel: ObservableObject {
     private let childProfileRepository: ChildProfileRepository
     private let pointTransactionRepository: PointTransactionRepository
     private let usageSessionRepository: UsageSessionRepository
+    private let errorHandler = ErrorHandlingService.shared
+    private let logger = Logger(subsystem: "com.screentime.rewards", category: "child-dashboard")
     private var cancellables = Set<AnyCancellable>()
 
     // For this demo, we'll use a mock child profile ID
@@ -33,13 +43,28 @@ class ChildDashboardViewModel: ObservableObject {
         self.childProfileRepository = childProfileRepository
         self.pointTransactionRepository = pointTransactionRepository
         self.usageSessionRepository = usageSessionRepository
+        setupErrorHandling()
+    }
+
+    // MARK: - Error Handling Setup
+
+    private func setupErrorHandling() {
+        // Clear errors when starting new operations
+        Publishers.CombineLatest($isLoading, $showError)
+            .filter { isLoading, _ in isLoading }
+            .sink { [weak self] _, _ in
+                self?.clearError()
+            }
+            .store(in: &cancellables)
     }
 
     func loadInitialData() async {
         isLoading = true
-        errorMessage = nil
+        clearError()
 
         do {
+            logger.info("Loading dashboard data for child: \(self.currentChildID)")
+
             async let childProfile = loadChildProfile()
             async let transactions = loadRecentTransactions()
             async let sessions = loadRecentSessions()
@@ -50,14 +75,17 @@ class ChildDashboardViewModel: ObservableObject {
             if let profile = profile {
                 currentPoints = profile.pointBalance
                 totalPointsEarned = profile.totalPointsEarned
+                logger.debug("Loaded child profile with \(profile.pointBalance) points")
             }
 
             recentTransactions = transactionList
             recentSessions = sessionList
             availableRewards = rewardList
 
+            logger.info("Successfully loaded dashboard data")
+
         } catch {
-            errorMessage = "Failed to load dashboard data: \(error.localizedDescription)"
+            handleError(error, context: "loadInitialData")
         }
 
         isLoading = false
@@ -84,22 +112,91 @@ class ChildDashboardViewModel: ObservableObject {
         }
     }
 
-    func redeemReward(_ reward: Reward) {
-        // In a real implementation, this would call the PointRedemptionService
-        // For now, we'll just simulate the redemption
-        guard currentPoints >= reward.pointCost else { return }
-        
-        currentPoints -= reward.pointCost
-        
-        // Animate the point deduction
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-            pointsAnimationScale = 0.8
+    func redeemReward(_ reward: Reward) async {
+        // Validate points before attempting redemption
+        guard currentPoints >= reward.pointCost else {
+            handleError(AppError.insufficientPoints, context: "redeemReward")
+            return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        do {
+            logger.info("Redeeming reward: \(reward.name) for \(reward.pointCost) points")
+
+            // In a real implementation, this would call the PointRedemptionService
+            // For now, we'll simulate the redemption with proper error handling
+            currentPoints -= reward.pointCost
+
+            // Animate the point deduction
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                self.pointsAnimationScale = 1.0
+                pointsAnimationScale = 0.8
             }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    self.pointsAnimationScale = 1.0
+                }
+            }
+
+            logger.info("Successfully redeemed reward: \(reward.name)")
+
+        } catch {
+            handleError(error, context: "redeemReward")
+            // Reset points if redemption failed
+            currentPoints += reward.pointCost
+        }
+    }
+
+    // MARK: - Error Handling Methods
+
+    /// Handle an error by converting it to AppError and updating UI state
+    private func handleError(_ error: Error, context: String) {
+        let appError = errorHandler.convertToAppError(error)
+        errorHandler.processError(appError, context: context)
+
+        currentError = appError
+        errorMessage = appError.localizedDescription
+        showError = true
+        canRetry = shouldAllowRetry(appError)
+
+        logger.error("Error in \(context): \(appError.localizedDescription)")
+    }
+
+    /// Clear current error state
+    func clearError() {
+        currentError = nil
+        errorMessage = nil
+        showError = false
+        canRetry = false
+    }
+
+    /// Retry the last failed operation
+    func retryLastOperation() async {
+        guard canRetry else { return }
+
+        clearError()
+
+        // Try to recover from the error if possible
+        if let error = currentError,
+           await errorHandler.attemptRecovery(from: error) {
+            logger.info("Successfully recovered from error, retrying operation")
+            await refreshData()
+        } else {
+            // If recovery failed, just retry the data load
+            await refreshData()
+        }
+    }
+
+    /// Determine if retry should be allowed for an error
+    private func shouldAllowRetry(_ error: AppError) -> Bool {
+        switch error {
+        case .networkUnavailable, .networkTimeout, .cloudKitNotAvailable:
+            return true
+        case .cloudKitSaveError, .cloudKitFetchError:
+            return true
+        case .systemError:
+            return true
+        default:
+            return false
         }
     }
 

@@ -208,7 +208,7 @@ final class AnalyticsServiceTests: XCTestCase {
 
 // MARK: - Mock Classes
 
-class MockAnalyticsConsentService: AnalyticsConsentService {
+class MockAnalyticsConsentService: AnalyticsConsentService, @unchecked Sendable {
     var collectionAllowed = true
 
     override func isCollectionAllowed(for userID: String) async -> Bool {
@@ -216,8 +216,8 @@ class MockAnalyticsConsentService: AnalyticsConsentService {
     }
 }
 
-class MockDataAnonymizationService: DataAnonymizationService {
-    override func anonymize(event: AnalyticsEvent) async -> AnalyticsEvent {
+class MockDataAnonymizationService: DataAnonymizationService, @unchecked Sendable {
+    override func anonymize(event: AnalyticsEvent) -> AnalyticsEvent {
         return event
     }
 
@@ -225,7 +225,7 @@ class MockDataAnonymizationService: DataAnonymizationService {
         return "test-user-id"
     }
 
-    override func getCurrentSessionID() async -> String {
+    override func getCurrentSessionID() -> String {
         return "test-session-id"
     }
 
@@ -236,13 +236,13 @@ class MockDataAnonymizationService: DataAnonymizationService {
     override func getOSVersion() async -> String {
         return "15.0"
     }
-    
-    func getDeviceModel() async -> String {
+
+    override func getDeviceModel() async -> String {
         return "iPhone"
     }
 }
 
-class MockAnalyticsAggregationService: AnalyticsAggregationService {
+class MockAnalyticsAggregationService: AnalyticsAggregationService, @unchecked Sendable {
     var dailyAggregationCalled = false
     var weeklyAggregationCalled = false
     var monthlyAggregationCalled = false

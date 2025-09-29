@@ -107,7 +107,7 @@ final class PrivacyFirstAnalyticsCollectorTests: XCTestCase {
 
 // MARK: - Mock Classes
 
-class MockAnalyticsService: AnalyticsService {
+class MockAnalyticsService: AnalyticsService, @unchecked Sendable {
     var trackFeatureUsageCalled = false
     var trackUserFlowCalled = false
     var trackPerformanceCalled = false
@@ -164,7 +164,7 @@ class MockAnalyticsService: AnalyticsService {
     }
 }
 
-class MockAnalyticsConsentServiceForCollectorTests: AnalyticsConsentService {
+class MockAnalyticsConsentServiceForCollectorTests: AnalyticsConsentService, @unchecked Sendable {
     var currentConsentLevel: AnalyticsConsentLevel = .detailed
     
     override func isDetailedCollectionAllowed(for familyID: String) async -> Bool {

@@ -50,12 +50,16 @@ final class AnalyticsConsentServiceTests: XCTestCase {
     func testGetConsentLevel_WhenNotSet_ReturnsNone() async {
         // Given
         let familyID = "family-123"
-        
+
         // When
-        let retrievedLevel = try await consentService.getConsentLevel(for: familyID)
-        
-        // Then
-        XCTAssertEqual(retrievedLevel, .none)
+        do {
+            let retrievedLevel = try await consentService.getConsentLevel(for: familyID)
+
+            // Then
+            XCTAssertEqual(retrievedLevel, .none)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
     
     // MARK: - Collection Permission Tests

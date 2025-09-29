@@ -7,6 +7,7 @@ final class AppErrorTests: XCTestCase {
         let error = AppError.networkUnavailable
         XCTAssertEqual(error.errorDescription, "No internet connection. Please check your network settings and try again.")
         XCTAssertEqual(error.failureReason, "Network unavailable")
+        XCTAssertEqual(error.recoverySuggestion, "Try connecting to Wi-Fi or cellular data, then retry the operation.")
     }
     
     func testNetworkTimeoutError() {
@@ -105,6 +106,42 @@ final class AppErrorTests: XCTestCase {
         let error = AppError.insufficientPoints
         XCTAssertEqual(error.errorDescription, "Not enough points for this reward.")
         XCTAssertEqual(error.failureReason, "Insufficient points")
+        XCTAssertEqual(error.recoverySuggestion, "Complete more learning activities to earn the required points.")
+    }
+
+    func testCloudKitNotAvailableErrorRecovery() {
+        let error = AppError.cloudKitNotAvailable
+        XCTAssertEqual(error.recoverySuggestion, "Go to Settings > [Your Name] > iCloud and make sure you're signed in.")
+    }
+
+    func testRecoverySuggestionNotEmpty() {
+        let allErrorCases: [AppError] = [
+            .networkUnavailable,
+            .networkTimeout,
+            .networkError("test"),
+            .cloudKitNotAvailable,
+            .cloudKitRecordNotFound,
+            .cloudKitSaveError("test"),
+            .cloudKitFetchError("test"),
+            .cloudKitDeleteError("test"),
+            .cloudKitZoneError("test"),
+            .invalidData("test"),
+            .missingRequiredField("test"),
+            .dataValidationError("test"),
+            .unauthorized,
+            .authenticationFailed,
+            .familyAccessDenied,
+            .insufficientPoints,
+            .invalidOperation("test"),
+            .operationNotAllowed("test"),
+            .systemError("test"),
+            .unknownError("test")
+        ]
+
+        for error in allErrorCases {
+            XCTAssertNotNil(error.recoverySuggestion, "Recovery suggestion should not be nil for \(error)")
+            XCTAssertFalse(error.recoverySuggestion?.isEmpty ?? true, "Recovery suggestion should not be empty for \(error)")
+        }
     }
     
     func testInvalidOperationErrorWithMessage() {

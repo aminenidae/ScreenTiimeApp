@@ -4,10 +4,10 @@ import UserNotifications
 
 /// Service responsible for notifying parents about suspicious usage sessions
 public class ParentNotificationService {
-    private let notificationCenter: UNUserNotificationCenter
+    private let notificationCenter: UNUserNotificationCenterProtocol
     private let familyRepository: FamilyRepository
-    
-    public init(familyRepository: FamilyRepository, notificationCenter: UNUserNotificationCenter = .current()) {
+
+    public init(familyRepository: FamilyRepository, notificationCenter: UNUserNotificationCenterProtocol = UNUserNotificationCenter.current()) {
         self.familyRepository = familyRepository
         self.notificationCenter = notificationCenter
     }
@@ -115,9 +115,9 @@ public class ParentNotificationService {
     /// Checks if notifications are authorized
     /// - Parameter completion: Completion handler with authorization status
     public func checkNotificationAuthorization(completion: @escaping (Bool) -> Void) {
-        notificationCenter.getNotificationSettings { settings in
+        notificationCenter.checkAuthorizationStatus { authorized in
             DispatchQueue.main.async {
-                completion(settings.authorizationStatus == .authorized)
+                completion(authorized)
             }
         }
     }
