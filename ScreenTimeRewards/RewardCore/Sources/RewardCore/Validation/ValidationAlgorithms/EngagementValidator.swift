@@ -3,6 +3,7 @@ import SharedModels
 import DeviceActivity
 
 /// Validator that detects passive usage vs active engagement
+@available(iOS 15.0, macOS 12.0, *)
 public class EngagementValidator: UsageValidator {
     public var validatorName: String { "EngagementValidator" }
     
@@ -12,39 +13,15 @@ public class EngagementValidator: UsageValidator {
     
     public init() {}
     
-    public func validateSession(_ session: UsageSession, validationLevel: ValidationLevel) async -> ValidationResult {
+    public func validate(session: UsageSession, familySettings: FamilySettings) async -> ValidationAlgorithmResult {
         let engagementMetrics = analyzeEngagement(in: session)
         let isPassiveUsage = detectPassiveUsage(engagementMetrics: engagementMetrics)
         
-        let validationScore: Double
-        let confidenceLevel: Double
-        let detectedPatterns: [GamingPattern]
-        
         if isPassiveUsage {
-            validationScore = 0.4 // Low score indicates passive usage
-            confidenceLevel = 0.75 // Moderate to high confidence
-            detectedPatterns = [.backgroundUsage] // Treat as background usage
+            return ValidationAlgorithmResult(isValid: false, violation: ValidationViolation.timeBased)
         } else {
-            validationScore = 0.9 // High score indicates active engagement
-            confidenceLevel = 0.8 // High confidence
-            detectedPatterns = []
+            return ValidationAlgorithmResult(isValid: true, violation: nil)
         }
-        
-        // Calculate adjustment factor based on validation level
-        let adjustmentFactor = calculateAdjustmentFactor(
-            validationScore: validationScore,
-            validationLevel: validationLevel
-        )
-        
-        return ValidationResult(
-            isValid: validationScore >= validationLevel.confidenceThreshold,
-            validationScore: validationScore,
-            confidenceLevel: confidenceLevel,
-            detectedPatterns: detectedPatterns,
-            engagementMetrics: engagementMetrics,
-            validationLevel: validationLevel,
-            adjustmentFactor: adjustmentFactor
-        )
     }
     
     /// Analyzes engagement metrics for a session
@@ -85,25 +62,5 @@ public class EngagementValidator: UsageValidator {
             engagementMetrics.appStateChanges < 3
         
         return isLowInteraction || isLongSessionWithLowActivity
-    }
-    
-    /// Calculates the adjustment factor based on validation score and level
-    /// - Parameters:
-    ///   - validationScore: The validation score
-    ///   - validationLevel: The validation strictness level
-    /// - Returns: Adjustment factor (0.0 to 1.0)
-    private func calculateAdjustmentFactor(validationScore: Double, validationLevel: ValidationLevel) -> Double {
-        // Lenient mode is more forgiving
-        if validationLevel == .lenient {
-            return validationScore >= 0.7 ? 1.0 : (validationScore >= 0.4 ? 0.5 : 0.25)
-        }
-        
-        // Strict mode is less forgiving
-        if validationLevel == .strict {
-            return validationScore >= 0.8 ? 1.0 : (validationScore >= 0.5 ? 0.25 : 0.0)
-        }
-        
-        // Moderate mode (default)
-        return validationScore >= 0.75 ? 1.0 : (validationScore >= 0.45 ? 0.5 : 0.0)
     }
 }

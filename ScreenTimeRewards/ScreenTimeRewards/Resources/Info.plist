@@ -52,5 +52,16 @@
 	<array>
 		<string>background-app-refresh</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.yourcompany.screentimerewards.invite</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>screentimerewards</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

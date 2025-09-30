@@ -80,8 +80,8 @@ final class ParentNotificationServiceTests: XCTestCase {
     
     func testCreateNotificationContent_ReturnsCorrectContent() {
         // Given
-        let validationResult = createTestValidationResult(confidence: 0.8)
-        let session = createTestSession()
+        let _ = createTestValidationResult(confidence: 0.8)
+        let _ = createTestSession()
         
         // When
         // We need to access the private method - for now we'll test through the public interface
@@ -92,8 +92,8 @@ final class ParentNotificationServiceTests: XCTestCase {
     
     func testCreateNotificationBody_IncludesSessionDetails() {
         // Given
-        let validationResult = createTestValidationResult(confidence: 0.8)
-        let session = createTestSession()
+        let _ = createTestValidationResult(confidence: 0.8)
+        let _ = createTestSession()
         
         // When
         // We need to access the private method - for now we'll test through the public interface
@@ -104,7 +104,7 @@ final class ParentNotificationServiceTests: XCTestCase {
     
     func testFormatDetectedPatterns_ReturnsFormattedString() {
         // Given
-        let patterns: [GamingPattern] = [.rapidAppSwitching(frequency: 5.0), .exactHourBoundaries]
+        let _ : [GamingPattern] = [.rapidAppSwitching(frequency: 5.0), .exactHourBoundaries]
         
         // When
         // We need to access the private method - for now we'll test through the public interface
@@ -132,7 +132,9 @@ final class ParentNotificationServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         // Since we're using a mock, we can't verify the exact result, but we can ensure
         // the method doesn't crash
-        XCTAssertTrue(true)
+        // Using the variables to avoid warnings
+        XCTAssertNotNil(grantedResult)
+        XCTAssertNil(errorResult)
     }
     
     func testCheckNotificationAuthorization_CallsNotificationCenter() {
@@ -150,7 +152,8 @@ final class ParentNotificationServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         // Since we're using a mock, we can't verify the exact result, but we can ensure
         // the method doesn't crash
-        XCTAssertTrue(true)
+        // Using the variable to avoid warnings
+        XCTAssertNotNil(authorizedResult)
     }
     
     // MARK: - Helper Methods

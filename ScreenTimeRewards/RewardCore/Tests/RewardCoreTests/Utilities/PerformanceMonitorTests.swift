@@ -10,8 +10,11 @@ final class PerformanceMonitorTests: XCTestCase {
         let expectedValue = "test result"
         
         // When
-        let result = await PerformanceMonitor.measure(operation: "testOperation") {
+        // Create an actual async operation to avoid warnings
+        let result = try await PerformanceMonitor.measure(operation: "testOperation") {
             operationExecuted = true
+            // Add an actual async operation to avoid warnings
+            try await Task.sleep(nanoseconds: 1_000_000) // 1ms sleep
             return expectedValue
         }
         
@@ -26,9 +29,15 @@ final class PerformanceMonitorTests: XCTestCase {
         let expectedValue = 42
         
         // When
+        // Call a function that actually can throw to avoid warnings
         let result = try PerformanceMonitor.measure(operation: "testOperation") {
             operationExecuted = true
-            return expectedValue
+            // Add an operation that can throw to avoid warnings
+            let optionalValue: Int? = 42
+            guard let value = optionalValue else {
+                throw NSError(domain: "TestError", code: 1, userInfo: nil)
+            }
+            return value
         }
         
         // Then
@@ -45,6 +54,8 @@ final class PerformanceMonitorTests: XCTestCase {
         // When/Then
         do {
             let _ = try await PerformanceMonitor.measure(operation: "testOperation") {
+                // Add an actual async operation to avoid warnings
+                try await Task.sleep(nanoseconds: 1_000_000) // 1ms sleep
                 throw TestError.testFailure
             }
             XCTFail("Expected error to be thrown")
@@ -62,7 +73,12 @@ final class PerformanceMonitorTests: XCTestCase {
         
         // When/Then
         XCTAssertThrowsError(try PerformanceMonitor.measure(operation: "testOperation") {
-            throw TestError.testFailure
+            // Add an operation that can actually throw to avoid warnings
+            let optionalValue: Int? = nil
+            guard let value = optionalValue else {
+                throw TestError.testFailure
+            }
+            return value
         })
     }
     

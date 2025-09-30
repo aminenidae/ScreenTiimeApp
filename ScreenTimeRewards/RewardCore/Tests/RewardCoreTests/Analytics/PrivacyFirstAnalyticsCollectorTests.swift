@@ -37,7 +37,7 @@ final class PrivacyFirstAnalyticsCollectorTests: XCTestCase {
         // Then
         XCTAssertTrue(mockAnalyticsService.trackFeatureUsageCalled)
         XCTAssertEqual(mockAnalyticsService.lastFeature, feature)
-        XCTAssertEqual(mockAnalyticsService.lastMetadata as? [String: String], metadata)
+        XCTAssertEqual(mockAnalyticsService.lastMetadata, metadata)
     }
     
     // MARK: - User Flow Tests

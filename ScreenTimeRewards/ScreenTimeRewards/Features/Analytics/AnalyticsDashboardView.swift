@@ -1,9 +1,11 @@
 import SwiftUI
 import SharedModels
 import RewardCore
+import SubscriptionService
 
 struct AnalyticsDashboardView: View {
     @StateObject private var viewModel = AnalyticsDashboardViewModel()
+    @AppStorage("currentFamilyID") private var currentFamilyID = "default-family"
     
     var body: some View {
         NavigationView {
@@ -20,8 +22,8 @@ struct AnalyticsDashboardView: View {
                     // Retention Metrics Section
                     RetentionMetricsSection(aggregations: viewModel.aggregations)
                     
-                    // Export Options
-                    ExportOptionsSection()
+                    // Export Options - Gated Feature
+                    ExportOptionsSection(familyID: currentFamilyID)
                 }
                 .padding()
             }
@@ -199,9 +201,12 @@ private struct RetentionMetricsCard: View {
 
 // MARK: - Export Options Section
 private struct ExportOptionsSection: View {
+    let familyID: String
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Export Data")
+                .premiumBadge(for: .exportReports, familyID: familyID)
             
             HStack {
                 Button(action: {
@@ -211,6 +216,9 @@ private struct ExportOptionsSection: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .featureGated(.exportReports, for: familyID) {
+                    // Handle paywall presentation if needed
+                }
                 
                 Button(action: {
                     // Export to PDF
@@ -219,6 +227,9 @@ private struct ExportOptionsSection: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .featureGated(.exportReports, for: familyID) {
+                    // Handle paywall presentation if needed
+                }
             }
         }
     }

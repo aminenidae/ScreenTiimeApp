@@ -7,16 +7,34 @@ import SharedModels
 final class FeatureGateServiceTests: XCTestCase {
     var featureGateService: FeatureGateService!
     fileprivate var mockFamilyRepository: MockFamilyRepository!
+    fileprivate var mockChildProfileRepository: MockChildProfileRepository!
+    fileprivate var mockEntitlementRepository: MockEntitlementRepository!
+    fileprivate var mockFraudDetectionService: MockFraudDetectionService!
 
     override func setUp() async throws {
         try await super.setUp()
         mockFamilyRepository = MockFamilyRepository()
-        featureGateService = FeatureGateService(familyRepository: mockFamilyRepository)
+        mockChildProfileRepository = MockChildProfileRepository()
+        mockEntitlementRepository = MockEntitlementRepository()
+        mockFraudDetectionService = MockFraudDetectionService()
+        
+        let entitlementValidationService = EntitlementValidationService(
+            entitlementRepository: mockEntitlementRepository,
+            fraudDetectionService: mockFraudDetectionService
+        )
+        
+        featureGateService = FeatureGateService(
+            entitlementValidationService: entitlementValidationService,
+            childProfileRepository: mockChildProfileRepository
+        )
     }
 
     override func tearDown() async throws {
         featureGateService = nil
         mockFamilyRepository = nil
+        mockChildProfileRepository = nil
+        mockEntitlementRepository = nil
+        mockFraudDetectionService = nil
         try await super.tearDown()
     }
 
@@ -283,5 +301,146 @@ fileprivate class MockFamilyRepository: FamilyRepository {
 
     func deleteFamily(id: String) async throws {
         families.removeValue(forKey: id)
+    }
+    
+    // MARK: - ChildProfileRepository conformance
+    
+    func createChild(_ child: ChildProfile) async throws -> ChildProfile {
+        // Not used in these tests
+        return child
+    }
+    
+    func fetchChild(id: String) async throws -> ChildProfile? {
+        // Not used in these tests
+        return nil
+    }
+    
+    func fetchChildren(for familyID: String) async throws -> [ChildProfile] {
+        // Not used in these tests
+        return []
+    }
+    
+    func updateChild(_ child: ChildProfile) async throws -> ChildProfile {
+        // Not used in these tests
+        return child
+    }
+    
+    func deleteChild(id: String) async throws {
+        // Not used in these tests
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+fileprivate class MockEntitlementRepository: SubscriptionEntitlementRepository {
+    var entitlements: [String: SubscriptionEntitlement] = [:]
+    var callCount = 0
+    var shouldThrowError = false
+
+    func createEntitlement(_ entitlement: SubscriptionEntitlement) async throws -> SubscriptionEntitlement {
+        entitlements[entitlement.familyID] = entitlement
+        return entitlement
+    }
+
+    func fetchEntitlement(id: String) async throws -> SubscriptionEntitlement? {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        return entitlements[id]
+    }
+
+    func fetchEntitlement(for familyID: String) async throws -> SubscriptionEntitlement? {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        return entitlements[familyID]
+    }
+
+    func fetchEntitlements(for familyID: String) async throws -> [SubscriptionEntitlement] {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        return [entitlements[familyID]].compactMap { $0 }
+    }
+
+    func fetchEntitlement(byTransactionID transactionID: String) async throws -> SubscriptionEntitlement? {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        return entitlements.first { $0.value.transactionID == transactionID }?.value
+    }
+
+    func fetchEntitlement(byOriginalTransactionID originalTransactionID: String) async throws -> SubscriptionEntitlement? {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        return entitlements.first { $0.value.originalTransactionID == originalTransactionID }?.value
+    }
+
+    func updateEntitlement(_ entitlement: SubscriptionEntitlement) async throws -> SubscriptionEntitlement {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        entitlements[entitlement.familyID] = entitlement
+        return entitlement
+    }
+
+    func deleteEntitlement(id: String) async throws {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        entitlements.removeValue(forKey: id)
+    }
+
+    func validateEntitlement(for familyID: String) async throws -> SubscriptionEntitlement? {
+        callCount += 1
+        if shouldThrowError {
+            throw AppError.unknownError("Test error")
+        }
+        return entitlements[familyID]
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+fileprivate class MockFraudDetectionService: FraudDetectionService {
+    func detectFraud(for entitlement: SubscriptionEntitlement, deviceInfo: [String : String]) async throws -> [FraudDetectionEvent] {
+        return []
+    }
+
+    func isJailbroken() -> Bool {
+        return false
+    }
+
+    func validateReceiptIntegrity(_ receiptData: String) -> Bool {
+        return true
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+fileprivate class MockChildProfileRepository: ChildProfileRepository {
+    func createChild(_ child: ChildProfile) async throws -> ChildProfile {
+        return child
+    }
+
+    func fetchChild(id: String) async throws -> ChildProfile? {
+        return nil
+    }
+
+    func fetchChildren(for familyID: String) async throws -> [ChildProfile] {
+        return []
+    }
+
+    func updateChild(_ child: ChildProfile) async throws -> ChildProfile {
+        return child
+    }
+
+    func deleteChild(id: String) async throws {
+        // No-op
     }
 }

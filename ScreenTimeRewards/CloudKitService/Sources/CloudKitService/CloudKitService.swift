@@ -2,7 +2,7 @@ import Foundation
 import SharedModels
 
 /// Main CloudKit service that provides access to all repository implementations
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public class CloudKitService {
     public static let shared = CloudKitService()
 
@@ -13,6 +13,7 @@ public class CloudKitService {
     private let _pointTransactionRepository: SharedModels.PointTransactionRepository
     private let _pointToTimeRedemptionRepository: SharedModels.PointToTimeRedemptionRepository
     private let _familyRepository: SharedModels.FamilyRepository
+    private let _parentCoordinationRepository: ParentCoordinationRepository
 
     private init() {
         // Initialize all repository implementations
@@ -22,12 +23,13 @@ public class CloudKitService {
         self._pointTransactionRepository = CloudKitService.PointTransactionRepository()
         self._pointToTimeRedemptionRepository = CloudKitService.PointToTimeRedemptionRepository()
         self._familyRepository = CloudKitService.FamilyRepository()
+        self._parentCoordinationRepository = CloudKitParentCoordinationRepository()
     }
 
     // MARK: - Nested Repository Types
 
     /// Nested AppCategorizationRepository class for easy instantiation in tests
-    @available(iOS 15.0, macOS 10.15, *)
+    @available(iOS 15.0, macOS 12.0, *)
     public class AppCategorizationRepository: SharedModels.AppCategorizationRepository {
         public init() {}
 
@@ -68,7 +70,7 @@ public class CloudKitService {
     }
 
     /// Nested UsageSessionRepository class for easy instantiation in tests
-    @available(iOS 15.0, macOS 10.15, *)
+    @available(iOS 15.0, macOS 12.0, *)
     public class UsageSessionRepository: SharedModels.UsageSessionRepository {
         public init() {}
 
@@ -101,7 +103,7 @@ public class CloudKitService {
     }
 
     /// Nested PointTransactionRepository class for easy instantiation in tests
-    @available(iOS 15.0, macOS 10.15, *)
+    @available(iOS 15.0, macOS 12.0, *)
     public class PointTransactionRepository: SharedModels.PointTransactionRepository {
         public init() {}
 
@@ -133,7 +135,7 @@ public class CloudKitService {
     }
 
     /// Nested PointToTimeRedemptionRepository class for easy instantiation in tests
-    @available(iOS 15.0, macOS 10.15, *)
+    @available(iOS 15.0, macOS 12.0, *)
     public class PointToTimeRedemptionRepository: SharedModels.PointToTimeRedemptionRepository {
         public init() {}
 
@@ -192,7 +194,7 @@ public class CloudKitService {
     }
 
     /// Nested FamilyRepository class for easy instantiation in tests
-    @available(iOS 15.0, macOS 10.15, *)
+    @available(iOS 15.0, macOS 12.0, *)
     public class FamilyRepository: SharedModels.FamilyRepository {
         public init() {}
 
@@ -223,7 +225,7 @@ public class CloudKitService {
 
 // MARK: - Repository Protocol Conformance
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension CloudKitService: ChildProfileRepository {
     public func createChild(_ child: ChildProfile) async throws -> ChildProfile {
         return try await _childProfileRepository.createChild(child)
@@ -246,7 +248,7 @@ extension CloudKitService: ChildProfileRepository {
     }
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension CloudKitService: SharedModels.AppCategorizationRepository {
     public func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
         return try await _appCategorizationRepository.createAppCategorization(categorization)
@@ -269,7 +271,7 @@ extension CloudKitService: SharedModels.AppCategorizationRepository {
     }
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension CloudKitService: SharedModels.UsageSessionRepository {
     public func createSession(_ session: UsageSession) async throws -> UsageSession {
         return try await _usageSessionRepository.createSession(session)
@@ -292,7 +294,7 @@ extension CloudKitService: SharedModels.UsageSessionRepository {
     }
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension CloudKitService: SharedModels.PointTransactionRepository {
     public func createTransaction(_ transaction: PointTransaction) async throws -> PointTransaction {
         return try await _pointTransactionRepository.createTransaction(transaction)
@@ -315,7 +317,7 @@ extension CloudKitService: SharedModels.PointTransactionRepository {
     }
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension CloudKitService: SharedModels.PointToTimeRedemptionRepository {
     public func createPointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption {
         return try await _pointToTimeRedemptionRepository.createPointToTimeRedemption(redemption)
@@ -342,7 +344,7 @@ extension CloudKitService: SharedModels.PointToTimeRedemptionRepository {
     }
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension CloudKitService: SharedModels.FamilyRepository {
     public func createFamily(_ family: Family) async throws -> Family {
         return try await _familyRepository.createFamily(family)
@@ -365,11 +367,30 @@ extension CloudKitService: SharedModels.FamilyRepository {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
+extension CloudKitService: ParentCoordinationRepository {
+    public func createCoordinationEvent(_ event: ParentCoordinationEvent) async throws -> ParentCoordinationEvent {
+        return try await _parentCoordinationRepository.createCoordinationEvent(event)
+    }
+
+    public func fetchCoordinationEvents(for familyID: UUID) async throws -> [ParentCoordinationEvent] {
+        return try await _parentCoordinationRepository.fetchCoordinationEvents(for: familyID)
+    }
+
+    public func fetchCoordinationEvents(for familyID: UUID, dateRange: DateRange?) async throws -> [ParentCoordinationEvent] {
+        return try await _parentCoordinationRepository.fetchCoordinationEvents(for: familyID, dateRange: dateRange)
+    }
+
+    public func deleteCoordinationEvent(id: UUID) async throws {
+        try await _parentCoordinationRepository.deleteCoordinationEvent(id: id)
+    }
+}
+
 // MARK: - Mock Child Profile Repository
 
 /// Temporary mock implementation for ChildProfileRepository
 /// In a real app, this would be implemented with actual CloudKit operations
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 private class MockChildProfileRepository: ChildProfileRepository {
     private var mockChildren: [String: ChildProfile] = [:]
 

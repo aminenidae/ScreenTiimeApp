@@ -276,33 +276,6 @@ public struct SubscriptionEntitlementInfo: Codable {
     }
 }
 
-public enum SubscriptionTier: String, Codable, CaseIterable {
-    case oneChild = "oneChild"
-    case twoChildren = "twoChildren"
-    case threeOrMore = "threeOrMore"
-
-    public var displayName: String {
-        switch self {
-        case .oneChild:
-            return "1 Child Plan"
-        case .twoChildren:
-            return "2 Children Plan"
-        case .threeOrMore:
-            return "3+ Children Plan"
-        }
-    }
-
-    public var maxChildren: Int {
-        switch self {
-        case .oneChild:
-            return 1
-        case .twoChildren:
-            return 2
-        case .threeOrMore:
-            return Int.max
-        }
-    }
-}
 
 public enum BillingPeriod: String, Codable, CaseIterable {
     case monthly = "monthly"

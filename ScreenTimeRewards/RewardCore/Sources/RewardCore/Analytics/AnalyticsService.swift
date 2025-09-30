@@ -186,13 +186,3 @@ extension AnalyticsService {
 }
 #endif
 
-// MARK: - Analytics Repository Protocol
-
-public protocol AnalyticsRepository: Sendable {
-    func saveEvent(_ event: AnalyticsEvent) async throws
-    func fetchEvents(for userID: String, dateRange: DateRange?) async throws -> [AnalyticsEvent]
-    func saveAggregation(_ aggregation: AnalyticsAggregation) async throws
-    func fetchAggregations(for aggregationType: AggregationType, dateRange: DateRange?) async throws -> [AnalyticsAggregation]
-    func saveConsent(_ consent: AnalyticsConsent) async throws
-    func fetchConsent(for familyID: String) async throws -> AnalyticsConsent?
-}

@@ -16,12 +16,13 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../SharedModels")
+        .package(path: "../SharedModels"),
+        .package(path: "../CloudKitService")
     ],
     targets: [
         .target(
             name: "SubscriptionService",
-            dependencies: ["SharedModels"]
+            dependencies: ["SharedModels", "CloudKitService"]
         ),
         .testTarget(
             name: "SubscriptionServiceTests",

@@ -3,6 +3,7 @@ import SharedModels
 import UserNotifications
 
 /// Service responsible for notifying parents about suspicious usage sessions
+@available(iOS 15.0, macOS 12.0, *)
 public class ParentNotificationService {
     private let notificationCenter: UNUserNotificationCenterProtocol
     private let familyRepository: FamilyRepository

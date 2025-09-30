@@ -2,7 +2,7 @@ import Foundation
 import SharedModels
 
 // Remove the duplicate protocol definition since it's now in SharedModels
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public class AppCategorizationRepository: SharedModels.AppCategorizationRepository {
     
     public init() {}

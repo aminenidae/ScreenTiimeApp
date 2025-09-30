@@ -1,16 +1,46 @@
 import SwiftUI
 import SharedModels
 import DesignSystem
+import SubscriptionService
 
 struct ParentDashboardView: View {
     @StateObject private var viewModel = ParentDashboardViewModel()
     @StateObject private var navigationCoordinator = ParentDashboardNavigationCoordinator()
+    @StateObject private var featureGateService = FeatureGateService.shared
+    @AppStorage("currentFamilyID") private var currentFamilyID = "default-family"
 
     private var navigationActions: ParentDashboardNavigationActions {
         ParentDashboardNavigationActions(coordinator: navigationCoordinator)
     }
 
     var body: some View {
+        TabView {
+            // Dashboard Tab
+            dashboardTab
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Dashboard")
+                }
+
+            // Activity Feed Tab
+            ActivityFeedView()
+                .tabItem {
+                    Image(systemName: "bell.fill")
+                    Text("Activity")
+                }
+        }
+        .task {
+            await viewModel.loadInitialData()
+        }
+        .onReceive(viewModel.childrenPublisher) { children in
+            // Reactive updates when children data changes
+        }
+        .onReceive(viewModel.progressDataPublisher) { progressData in
+            // Reactive updates when progress data changes
+        }
+    }
+
+    private var dashboardTab: some View {
         NavigationStack(path: $navigationCoordinator.navigationPath) {
             ZStack {
                 if viewModel.isLoading && viewModel.children.isEmpty {
@@ -31,15 +61,6 @@ struct ParentDashboardView: View {
                 }
             }
         }
-        .task {
-            await viewModel.loadInitialData()
-        }
-        .onReceive(viewModel.childrenPublisher) { children in
-            // Reactive updates when children data changes
-        }
-        .onReceive(viewModel.progressDataPublisher) { progressData in
-            // Reactive updates when progress data changes
-        }
         .navigationDestination(for: ParentDashboardDestination.self) { destination in
             destinationView(for: destination)
         }
@@ -51,6 +72,9 @@ struct ParentDashboardView: View {
     private var dashboardContent: some View {
         ScrollView {
             LazyVStack(spacing: 20) {
+                // Trial Countdown Banner (if in trial)
+                trialCountdownBanner
+                
                 // Family Overview Section
                 familyOverviewSection
 
@@ -62,6 +86,10 @@ struct ParentDashboardView: View {
             }
             .padding()
         }
+    }
+
+    private var trialCountdownBanner: some View {
+        FamilyTrialCountdownBanner(familyID: currentFamilyID)
     }
 
     private var familyOverviewSection: some View {
@@ -145,6 +173,9 @@ struct ParentDashboardView: View {
                     icon: "person.badge.plus.fill",
                     action: { navigationActions.presentAddChild() }
                 )
+                .featureGated(.childProfileCreation, for: currentFamilyID) {
+                    // Handle paywall presentation if needed
+                }
             }
         }
     }
@@ -200,6 +231,9 @@ struct ParentDashboardView: View {
                 navigationActions.presentAddChild()
             }
             .buttonStyle(.borderedProminent)
+            .featureGated(.childProfileCreation, for: currentFamilyID) {
+                // Handle paywall presentation if needed
+            }
         }
         .padding()
     }

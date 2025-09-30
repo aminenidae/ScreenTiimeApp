@@ -1,7 +1,7 @@
 import Foundation
 import SharedModels
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public class PointToTimeRedemptionRepository: SharedModels.PointToTimeRedemptionRepository {
 
     public init() {}

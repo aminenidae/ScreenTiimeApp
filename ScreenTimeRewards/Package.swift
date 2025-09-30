@@ -86,7 +86,7 @@ let package = Package(
         // SubscriptionService
         .target(
             name: "SubscriptionService",
-            dependencies: ["SharedModels"],
+            dependencies: ["SharedModels", "RewardCore"],
             path: "SubscriptionService/Sources/SubscriptionService"
         ),
         .testTarget(

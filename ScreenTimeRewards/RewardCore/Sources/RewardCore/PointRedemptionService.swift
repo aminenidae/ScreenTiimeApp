@@ -3,6 +3,7 @@ import SharedModels
 import CloudKitService
 
 /// Service responsible for handling point-to-screen-time conversions and redemptions
+@available(iOS 15.0, macOS 12.0, *)
 public class PointRedemptionService {
     public static let shared = PointRedemptionService(
         childProfileRepository: CloudKitService.shared,
@@ -22,11 +23,19 @@ public class PointRedemptionService {
     public enum ValidationResult {
         case valid
         case insufficientPoints(required: Int, available: Int)
+        case rewardInactive
         case invalidConversionRate
         case appNotFound
         case parentSettingsRestricted
         case timeLimitExceeded
         case systemError(String)
+        
+        public var isValid: Bool {
+            if case .valid = self {
+                return true
+            }
+            return false
+        }
     }
 
     private let childProfileRepository: SharedModels.ChildProfileRepository
@@ -108,6 +117,8 @@ public class PointRedemptionService {
             return .systemError("Time allocation restricted by parent settings")
         case .systemError(let message):
             return .systemError(message)
+        case .rewardInactive:
+            return .invalidApp
         }
 
         // Get app categorization for conversion rate
@@ -267,14 +278,8 @@ public enum RedemptionError: Error, LocalizedError {
 
 // MARK: - ValidationResult Extension
 
+@available(iOS 15.0, macOS 12.0, *)
 extension PointRedemptionService.ValidationResult {
-    public var isValid: Bool {
-        if case .valid = self {
-            return true
-        }
-        return false
-    }
-
     public var errorMessage: String {
         switch self {
         case .valid:
@@ -291,6 +296,8 @@ extension PointRedemptionService.ValidationResult {
             return "Would exceed daily time limits"
         case .systemError(let message):
             return "System error: \(message)"
+        case .rewardInactive:
+            return "Reward is currently inactive"
         }
     }
 }

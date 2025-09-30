@@ -1,192 +1,111 @@
 import Foundation
 import SharedModels
-import FamilyControlsKit
-import DeviceActivity
+
+// MARK: - Validation Protocol and Types
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol UsageValidator {
+    func validate(session: UsageSession, familySettings: FamilySettings) async -> ValidationAlgorithmResult
+    var validatorName: String { get }
+}
+
+/// Result from a single validation algorithm
+@available(iOS 15.0, macOS 12.0, *)
+public struct ValidationAlgorithmResult {
+    public let isValid: Bool
+    public let violation: ValidationViolation?
+    
+    public init(isValid: Bool, violation: ValidationViolation?) {
+        self.isValid = isValid
+        self.violation = violation
+    }
+}
+
+/// Types of validation violations
+@available(iOS 15.0, macOS 12.0, *)
+public enum ValidationViolation {
+    case timeBased
+    case appCategory
+    case frequency
+}
 
 /// Service responsible for validating usage sessions to prevent gaming of the reward system
+@available(iOS 15.0, macOS 12.0, *)
 public class UsageValidationService {
     private let validationAlgorithms: [UsageValidator]
     private let familySettingsRepository: FamilySettingsRepository
     private let parentNotificationService: ParentNotificationService?
-    
+
     public init(
         familySettingsRepository: FamilySettingsRepository,
         parentNotificationService: ParentNotificationService? = nil
     ) {
-        self.familySettingsRepository = familySettingsRepository
-        self.parentNotificationService = parentNotificationService
         self.validationAlgorithms = [
-            RapidSwitchingValidator(),
             EngagementValidator(),
+            RapidSwitchingValidator(),
             TimingPatternValidator()
         ]
+        self.familySettingsRepository = familySettingsRepository
+        self.parentNotificationService = parentNotificationService
     }
-    
-    public func validateUsageSession(_ session: UsageSession, familyID: String) async throws -> ValidationResult {
-        // Get family settings to determine validation strictness
-        // Since we removed validationStrictness from FamilySettings to avoid circular dependencies,
-        // we'll use a default validation level
-        let validationLevel: ValidationLevel = .moderate
+
+    /// Validate a usage session against all validation algorithms
+    /// - Parameter session: The session to validate
+    /// - Returns: Validation result with details
+    public func validateSession(_ session: UsageSession) async throws -> ValidationResult {
+        // Get family settings for context
+        let settings = try await familySettingsRepository.fetchSettings(for: session.childProfileID)
+        
+        // If no settings found, create default settings
+        let familySettings = settings ?? FamilySettings(
+            id: UUID().uuidString,
+            familyID: session.childProfileID,
+            dailyTimeLimit: nil,
+            bedtimeStart: nil,
+            bedtimeEnd: nil,
+            contentRestrictions: [:]
+        )
         
         // Run all validation algorithms
-        var results: [ValidationResult] = []
+        var results: [ValidationAlgorithmResult] = []
         for validator in validationAlgorithms {
-            let result = await validator.validateSession(session, validationLevel: validationLevel)
+            let result = await validator.validate(session: session, familySettings: familySettings)
             results.append(result)
         }
         
-        // Combine results using weighted scoring
-        let combinedResult = combineValidationResults(results, validationLevel: validationLevel)
-        
-        // Notify parents if confidence is high enough
-        if let parentNotificationService = parentNotificationService,
-           combinedResult.confidenceLevel > 0.75 {
-            await parentNotificationService.notifyParents(of: combinedResult, for: session, familyID: familyID)
-        }
-        
-        return combinedResult
-    }
-    
-    /// Combines multiple validation results into a single result
-    /// - Parameters:
-    ///   - results: Array of individual validation results
-    ///   - validationLevel: The validation strictness level
-    /// - Returns: Combined ValidationResult
-    private func combineValidationResults(_ results: [ValidationResult], validationLevel: ValidationLevel) -> ValidationResult {
-        guard !results.isEmpty else {
-            // Return default valid result if no validations ran
-            return ValidationResult(
-                isValid: true,
-                validationScore: 1.0,
-                confidenceLevel: 1.0,
-                detectedPatterns: [],
-                engagementMetrics: EngagementMetrics(
-                    appStateChanges: 0,
-                    averageSessionLength: 0,
-                    interactionDensity: 1.0,
-                    deviceMotionCorrelation: nil
-                ),
-                validationLevel: validationLevel,
-                adjustmentFactor: 1.0
-            )
-        }
-        
-        // Calculate weighted averages
-        let totalScore = results.reduce(0.0) { $0 + $1.validationScore }
-        let totalConfidence = results.reduce(0.0) { $0 + $1.confidenceLevel }
-        let averageScore = totalScore / Double(results.count)
-        let averageConfidence = totalConfidence / Double(results.count)
-        
-        // Combine detected patterns
-        let allPatterns = results.flatMap { $0.detectedPatterns }
-        
-        // Combine engagement metrics (simplified averaging)
-        let totalAppStateChanges = results.reduce(0) { $0 + $1.engagementMetrics.appStateChanges }
-        let totalAverageSessionLength = results.reduce(0.0) { $0 + $1.engagementMetrics.averageSessionLength }
-        let totalInteractionDensity = results.reduce(0.0) { $0 + $1.engagementMetrics.interactionDensity }
-        
-        let combinedMetrics = EngagementMetrics(
-            appStateChanges: totalAppStateChanges / results.count,
-            averageSessionLength: totalAverageSessionLength / Double(results.count),
-            interactionDensity: totalInteractionDensity / Double(results.count),
-            deviceMotionCorrelation: results.first?.engagementMetrics.deviceMotionCorrelation
-        )
-        
-        // Determine if session is valid based on validation level threshold
-        let isValid = averageScore >= validationLevel.confidenceThreshold
-        
-        // Calculate adjustment factor for point calculation
-        let adjustmentFactor = calculateAdjustmentFactor(
-            validationScore: averageScore,
-            confidenceLevel: averageConfidence,
-            validationLevel: validationLevel
-        )
-        
-        return ValidationResult(
-            isValid: isValid,
-            validationScore: averageScore,
-            confidenceLevel: averageConfidence,
-            detectedPatterns: allPatterns,
-            engagementMetrics: combinedMetrics,
-            validationLevel: validationLevel,
-            adjustmentFactor: adjustmentFactor
-        )
-    }
-    
-    /// Calculates the adjustment factor for point calculation based on validation results
-    /// - Parameters:
-    ///   - validationScore: The validation score (0.0 to 1.0)
-    ///   - confidenceLevel: The confidence level in the validation (0.0 to 1.0)
-    ///   - validationLevel: The validation strictness level
-    /// - Returns: Adjustment factor (0.0 to 1.0)
-    private func calculateAdjustmentFactor(validationScore: Double, confidenceLevel: Double, validationLevel: ValidationLevel) -> Double {
-        // If validation score is high, give full points
-        if validationScore >= 0.95 {
-            return 1.0
-        }
-        
-        // If validation score is medium, give partial points
-        if validationScore >= 0.75 {
-            return 0.75
-        }
-        
-        // If validation score is low, give minimal points
-        if validationScore >= 0.5 {
-            return 0.5
-        }
-        
-        // If validation score is very low, give no points
-        return 0.0
-    }
-}
-
-/// Protocol for usage validation algorithms
-public protocol UsageValidator {
-    func validateSession(_ session: UsageSession, validationLevel: ValidationLevel) async -> ValidationResult
-    var validatorName: String { get }
-}
-
-/// Composite validator that combines multiple validation algorithms
-public class CompositeUsageValidator: UsageValidator {
-    private let validators: [UsageValidator]
-    
-    public var validatorName: String { "CompositeValidator" }
-    
-    public init(validators: [UsageValidator]) {
-        self.validators = validators
-    }
-    
-    public func validateSession(_ session: UsageSession, validationLevel: ValidationLevel) async -> ValidationResult {
-        var results: [ValidationResult] = []
-        for validator in validators {
-            let result = await validator.validateSession(session, validationLevel: validationLevel)
-            results.append(result)
-        }
-        
-        // Simple combination - return the most conservative result
+        // Aggregate results
         let isValid = results.allSatisfy { $0.isValid }
-        let lowestScore = results.map { $0.validationScore }.min() ?? 1.0
-        let lowestConfidence = results.map { $0.confidenceLevel }.min() ?? 1.0
-        let allPatterns = results.flatMap { $0.detectedPatterns }
-        
-        // Take metrics from first validator or create default
-        let metrics = results.first?.engagementMetrics ?? EngagementMetrics(
-            appStateChanges: 0,
-            averageSessionLength: session.duration,
-            interactionDensity: 1.0,
-            deviceMotionCorrelation: nil
-        )
-        
-        let adjustmentFactor = results.map { $0.adjustmentFactor }.min() ?? 1.0
+        let violations = results.compactMap { $0.violation }
         
         return ValidationResult(
             isValid: isValid,
-            validationScore: lowestScore,
-            confidenceLevel: lowestConfidence,
-            detectedPatterns: allPatterns,
-            engagementMetrics: metrics,
-            validationLevel: validationLevel,
-            adjustmentFactor: adjustmentFactor
+            violations: violations,
+            confidenceScore: calculateConfidenceScore(from: results)
         )
+    }
+    
+    /// Calculate overall confidence score from individual validation results
+    private func calculateConfidenceScore(from results: [ValidationAlgorithmResult]) -> Double {
+        guard !results.isEmpty else { return 1.0 }
+        
+        let validCount = results.filter { $0.isValid }.count
+        return Double(validCount) / Double(results.count)
+    }
+}
+
+// MARK: - Supporting Types
+
+@available(iOS 15.0, macOS 12.0, *)
+public extension UsageValidationService {
+    struct ValidationResult {
+        public let isValid: Bool
+        public let violations: [ValidationViolation]
+        public let confidenceScore: Double
+        
+        public init(isValid: Bool, violations: [ValidationViolation], confidenceScore: Double) {
+            self.isValid = isValid
+            self.violations = violations
+            self.confidenceScore = confidenceScore
+        }
     }
 }

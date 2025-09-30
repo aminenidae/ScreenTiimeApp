@@ -100,6 +100,20 @@ public final class SubscriptionCancellationDetector: ObservableObject {
         accessEndDate = nil
         hasShownResubscriptionOffer = false
     }
+    
+    #if DEBUG
+    /// Test method to set cancellation detected state
+    public func setCancellationDetected(_ detected: Bool, date: Date? = nil, accessEndDate: Date? = nil) {
+        cancellationDetected = detected
+        cancellationDate = date
+        self.accessEndDate = accessEndDate
+    }
+    
+    /// Test method to set resubscription offer shown state
+    public func setHasShownResubscriptionOffer(_ shown: Bool) {
+        hasShownResubscriptionOffer = shown
+    }
+    #endif
 
     // MARK: - Private Methods
 

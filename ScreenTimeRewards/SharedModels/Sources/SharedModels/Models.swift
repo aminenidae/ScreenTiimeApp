@@ -2,6 +2,34 @@ import Foundation
 
 // MARK: - Core Data Models
 
+public struct DateRange: Codable, Equatable {
+    public let start: Date
+    public let end: Date
+    
+    public init(start: Date, end: Date) {
+        self.start = start
+        self.end = end
+    }
+}
+
+// MARK: - DateRange Extensions
+
+public extension DateRange {
+    static func last30Days() -> DateRange {
+        let calendar = Calendar.current
+        let end = Date()
+        let start = calendar.date(byAdding: .day, value: -30, to: end)!
+        return DateRange(start: start, end: end)
+    }
+    
+    static func singleDay(_ date: Date) -> DateRange {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: date)
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        return DateRange(start: start, end: end)
+    }
+}
+
 public struct Family: Codable, Identifiable {
     public let id: String
     public var name: String
@@ -17,8 +45,10 @@ public struct Family: Codable, Identifiable {
     public var subscriptionMetadata: SubscriptionMetadata?
     // Real-time subscription status synchronized from StoreKit
     public var subscriptionStatus: SubscriptionStatus?
+    // Permission roles for family members
+    public var userRoles: [String: PermissionRole]
 
-    public init(id: String, name: String, createdAt: Date, ownerUserID: String, sharedWithUserIDs: [String], childProfileIDs: [String], parentalConsentGiven: Bool = false, parentalConsentDate: Date? = nil, parentalConsentMethod: String? = nil, subscriptionMetadata: SubscriptionMetadata? = nil, subscriptionStatus: SubscriptionStatus? = nil) {
+    public init(id: String, name: String, createdAt: Date, ownerUserID: String, sharedWithUserIDs: [String], childProfileIDs: [String], parentalConsentGiven: Bool = false, parentalConsentDate: Date? = nil, parentalConsentMethod: String? = nil, subscriptionMetadata: SubscriptionMetadata? = nil, subscriptionStatus: SubscriptionStatus? = nil, userRoles: [String: PermissionRole] = [:]) {
         self.id = id
         self.name = name
         self.createdAt = createdAt
@@ -30,6 +60,7 @@ public struct Family: Codable, Identifiable {
         self.parentalConsentMethod = parentalConsentMethod
         self.subscriptionMetadata = subscriptionMetadata
         self.subscriptionStatus = subscriptionStatus
+        self.userRoles = userRoles
     }
 }
 
@@ -389,21 +420,170 @@ public struct SubscriptionMetadata: Codable {
     }
 }
 
+// MARK: - Subscription Models
+
+public enum SubscriptionTier: String, Codable, CaseIterable {
+    case oneChild = "oneChild"
+    case twoChildren = "twoChildren"
+    case threeOrMore = "threeOrMore"
+
+    public var displayName: String {
+        switch self {
+        case .oneChild:
+            return "1 Child Plan"
+        case .twoChildren:
+            return "2 Children Plan"
+        case .threeOrMore:
+            return "3+ Children Plan"
+        }
+    }
+
+    public var maxChildren: Int {
+        switch self {
+        case .oneChild:
+            return 1
+        case .twoChildren:
+            return 2
+        case .threeOrMore:
+            return Int.max
+        }
+    }
+}
+
 public struct SubscriptionEntitlement: Codable, Identifiable {
     public let id: String
     public let familyID: String
-    public let subscriptionType: String
-    public let startDate: Date
-    public let endDate: Date
-    public let isActive: Bool
+    public let subscriptionTier: SubscriptionTier
+    public let receiptData: String
+    public let originalTransactionID: String
+    public let transactionID: String
+    public let purchaseDate: Date
+    public let expirationDate: Date
+    public var isActive: Bool
+    public var isInTrial: Bool
+    public var autoRenewStatus: Bool
+    public var lastValidatedAt: Date
+    public var gracePeriodExpiresAt: Date?
+    public let metadata: [String: String]
 
-    public init(id: String, familyID: String, subscriptionType: String, startDate: Date, endDate: Date, isActive: Bool) {
+    public init(
+        id: String,
+        familyID: String,
+        subscriptionTier: SubscriptionTier,
+        receiptData: String,
+        originalTransactionID: String,
+        transactionID: String,
+        purchaseDate: Date,
+        expirationDate: Date,
+        isActive: Bool,
+        isInTrial: Bool = false,
+        autoRenewStatus: Bool = true,
+        lastValidatedAt: Date = Date(),
+        gracePeriodExpiresAt: Date? = nil,
+        metadata: [String: String] = [:]
+    ) {
         self.id = id
         self.familyID = familyID
-        self.subscriptionType = subscriptionType
-        self.startDate = startDate
-        self.endDate = endDate
+        self.subscriptionTier = subscriptionTier
+        self.receiptData = receiptData
+        self.originalTransactionID = originalTransactionID
+        self.transactionID = transactionID
+        self.purchaseDate = purchaseDate
+        self.expirationDate = expirationDate
         self.isActive = isActive
+        self.isInTrial = isInTrial
+        self.autoRenewStatus = autoRenewStatus
+        self.lastValidatedAt = lastValidatedAt
+        self.gracePeriodExpiresAt = gracePeriodExpiresAt
+        self.metadata = metadata
+    }
+}
+
+// MARK: - Fraud Prevention Models
+
+public enum FraudDetectionType: String, Codable, CaseIterable {
+    case duplicateTransaction = "duplicateTransaction"
+    case tamperedReceipt = "tamperedReceipt"
+    case jailbrokenDevice = "jailbrokenDevice"
+    case anomalousUsage = "anomalousUsage"
+}
+
+public struct FraudDetectionEvent: Codable, Identifiable {
+    public let id: String
+    public let familyID: String
+    public let detectionType: FraudDetectionType
+    public let severity: FraudSeverity
+    public let timestamp: Date
+    public let deviceInfo: [String: String]
+    public let transactionInfo: [String: String]?
+    public let metadata: [String: String]
+
+    public init(
+        id: String = UUID().uuidString,
+        familyID: String,
+        detectionType: FraudDetectionType,
+        severity: FraudSeverity,
+        timestamp: Date = Date(),
+        deviceInfo: [String: String],
+        transactionInfo: [String: String]? = nil,
+        metadata: [String: String] = [:]
+    ) {
+        self.id = id
+        self.familyID = familyID
+        self.detectionType = detectionType
+        self.severity = severity
+        self.timestamp = timestamp
+        self.deviceInfo = deviceInfo
+        self.transactionInfo = transactionInfo
+        self.metadata = metadata
+    }
+}
+
+public enum FraudSeverity: String, Codable, CaseIterable {
+    case low = "low"
+    case medium = "medium"
+    case high = "high"
+    case critical = "critical"
+}
+
+// MARK: - Audit Logging Models
+
+public enum ValidationEventType: String, Codable, CaseIterable {
+    case receiptValidated = "receiptValidated"
+    case entitlementCreated = "entitlementCreated"
+    case entitlementUpdated = "entitlementUpdated"
+    case entitlementExpired = "entitlementExpired"
+    case gracePeriodStarted = "gracePeriodStarted"
+    case gracePeriodEnded = "gracePeriodEnded"
+    case fraudDetected = "fraudDetected"
+    case validationFailed = "validationFailed"
+}
+
+public struct ValidationAuditLog: Codable, Identifiable {
+    public let id: String
+    public let familyID: String
+    public let transactionID: String?
+    public let productID: String
+    public let eventType: ValidationEventType
+    public let timestamp: Date
+    public let metadata: [String: String]
+
+    public init(
+        id: String = UUID().uuidString,
+        familyID: String,
+        transactionID: String? = nil,
+        productID: String,
+        eventType: ValidationEventType,
+        timestamp: Date = Date(),
+        metadata: [String: String] = [:]
+    ) {
+        self.id = id
+        self.familyID = familyID
+        self.transactionID = transactionID
+        self.productID = productID
+        self.eventType = eventType
+        self.timestamp = timestamp
+        self.metadata = metadata
     }
 }
 
@@ -571,9 +751,94 @@ public struct AchievementBadge: Codable, Equatable, Identifiable {
     }
 }
 
+// MARK: - Permission Models
+
+public enum PermissionRole: String, Codable, CaseIterable {
+    case owner = "owner"
+    case coParent = "coParent"
+    case viewer = "viewer" // For v1.2
+
+    public var displayName: String {
+        switch self {
+        case .owner:
+            return "Owner"
+        case .coParent:
+            return "Co-Parent"
+        case .viewer:
+            return "Viewer"
+        }
+    }
+
+    public var hasFullAccess: Bool {
+        switch self {
+        case .owner, .coParent:
+            return true
+        case .viewer:
+            return false
+        }
+    }
+}
+
+public enum PermissionAction: String, Codable, CaseIterable {
+    case view = "view"
+    case edit = "edit"
+    case delete = "delete"
+    case invite = "invite"
+    case remove = "remove"
+
+    public var displayName: String {
+        switch self {
+        case .view:
+            return "View"
+        case .edit:
+            return "Edit"
+        case .delete:
+            return "Delete"
+        case .invite:
+            return "Invite"
+        case .remove:
+            return "Remove"
+        }
+    }
+}
+
+public struct PermissionCheck: Codable {
+    public let userID: String
+    public let familyID: String
+    public let action: PermissionAction
+    public let targetEntity: String?
+
+    public init(userID: String, familyID: String, action: PermissionAction, targetEntity: String? = nil) {
+        self.userID = userID
+        self.familyID = familyID
+        self.action = action
+        self.targetEntity = targetEntity
+    }
+}
+
+public enum PermissionError: Error, LocalizedError {
+    case unauthorized(action: PermissionAction)
+    case invalidRole
+    case familyNotFound
+    case userNotFound
+
+    public var errorDescription: String? {
+        switch self {
+        case .unauthorized(let action):
+            return "You don't have permission to \(action.displayName.lowercased()) this item."
+        case .invalidRole:
+            return "Invalid permission role."
+        case .familyNotFound:
+            return "Family not found."
+        case .userNotFound:
+            return "User not found in family."
+        }
+    }
+}
+
 // MARK: - Repository Protocols
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol ChildProfileRepository {
     func createChild(_ child: ChildProfile) async throws -> ChildProfile
     func fetchChild(id: String) async throws -> ChildProfile?
@@ -582,7 +847,7 @@ public protocol ChildProfileRepository {
     func deleteChild(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol AppCategorizationRepository {
     func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization
     func fetchAppCategorization(id: String) async throws -> AppCategorization?
@@ -591,7 +856,7 @@ public protocol AppCategorizationRepository {
     func deleteAppCategorization(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol UsageSessionRepository {
     func createSession(_ session: UsageSession) async throws -> UsageSession
     func fetchSession(id: String) async throws -> UsageSession?
@@ -600,7 +865,7 @@ public protocol UsageSessionRepository {
     func deleteSession(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol PointTransactionRepository {
     func createTransaction(_ transaction: PointTransaction) async throws -> PointTransaction
     func fetchTransaction(id: String) async throws -> PointTransaction?
@@ -609,7 +874,7 @@ public protocol PointTransactionRepository {
     func deleteTransaction(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol PointToTimeRedemptionRepository {
     func createPointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption
     func fetchPointToTimeRedemption(id: String) async throws -> PointToTimeRedemption?
@@ -619,7 +884,7 @@ public protocol PointToTimeRedemptionRepository {
     func deletePointToTimeRedemption(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol FamilyRepository {
     func createFamily(_ family: Family) async throws -> Family
     func fetchFamily(id: String) async throws -> Family?
@@ -628,7 +893,7 @@ public protocol FamilyRepository {
     func deleteFamily(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol FamilySettingsRepository {
     func createSettings(_ settings: FamilySettings) async throws -> FamilySettings
     func fetchSettings(for familyID: String) async throws -> FamilySettings?
@@ -636,26 +901,82 @@ public protocol FamilySettingsRepository {
     func deleteSettings(id: String) async throws
 }
 
-@available(iOS 15.0, macOS 10.15, *)
+@available(iOS 15.0, macOS 12.0, *)
 public protocol SubscriptionEntitlementRepository {
     func createEntitlement(_ entitlement: SubscriptionEntitlement) async throws -> SubscriptionEntitlement
     func fetchEntitlement(id: String) async throws -> SubscriptionEntitlement?
+    func fetchEntitlement(for familyID: String) async throws -> SubscriptionEntitlement?
     func fetchEntitlements(for familyID: String) async throws -> [SubscriptionEntitlement]
+    func fetchEntitlement(byTransactionID transactionID: String) async throws -> SubscriptionEntitlement?
+    func fetchEntitlement(byOriginalTransactionID originalTransactionID: String) async throws -> SubscriptionEntitlement?
     func updateEntitlement(_ entitlement: SubscriptionEntitlement) async throws -> SubscriptionEntitlement
     func deleteEntitlement(id: String) async throws
+    func validateEntitlement(for familyID: String) async throws -> SubscriptionEntitlement?
+}
+
+// MARK: - Parent Coordination Models
+
+public enum ParentCoordinationEventType: String, Codable, CaseIterable {
+    case usageSessionChanged
+    case appCategorizationChanged
+    case settingsUpdated
+    case pointsAdjusted
+    case rewardRedeemed
+    case childProfileModified
+}
+
+// Simple codable dictionary for changes
+public struct CodableDictionary: Codable, Equatable {
+    private let values: [String: String]
+    
+    public init(_ dictionary: [String: String]) {
+        self.values = dictionary
+    }
+    
+    public subscript(key: String) -> String? {
+        return values[key]
+    }
+    
+    public var dictionary: [String: String] {
+        return values
+    }
+}
+
+public struct ParentCoordinationEvent: Codable, Identifiable {
+    public let id: UUID
+    public let familyID: UUID
+    public let triggeringUserID: String
+    public let eventType: ParentCoordinationEventType
+    public let targetEntity: String
+    public let targetEntityID: UUID
+    public let changes: CodableDictionary
+    public let timestamp: Date
+    public let deviceID: String?
+    
+    public init(
+        id: UUID,
+        familyID: UUID,
+        triggeringUserID: String,
+        eventType: ParentCoordinationEventType,
+        targetEntity: String,
+        targetEntityID: UUID,
+        changes: CodableDictionary,
+        timestamp: Date,
+        deviceID: String?
+    ) {
+        self.id = id
+        self.familyID = familyID
+        self.triggeringUserID = triggeringUserID
+        self.eventType = eventType
+        self.targetEntity = targetEntity
+        self.targetEntityID = targetEntityID
+        self.changes = changes
+        self.timestamp = timestamp
+        self.deviceID = deviceID
+    }
 }
 
 // MARK: - Helper Types
-
-public struct DateRange: Codable {
-    public let start: Date
-    public let end: Date
-    
-    public init(start: Date, end: Date) {
-        self.start = start
-        self.end = end
-    }
-}
 
 public struct NotificationPreferences: Codable {
     public var enabledNotifications: Set<NotificationEvent>
@@ -780,8 +1101,294 @@ public struct DeviceActivitySchedule: Codable, Equatable {
 
 // MARK: - Validation Models (Moved from RewardCore to avoid circular dependency)
 
-// MARK: - Validation Models (Removed from here to avoid circular dependency)
-// These models have been moved back to RewardCore module
+// MARK: - Admin Action Models
 
-// MARK: - Validation Models (Removed from here to avoid circular dependency)
-// These models have been moved back to RewardCore module
+public enum AdminActionType: String, Codable, CaseIterable {
+    case suspendFamily = "suspendFamily"
+    case activateFamily = "activateFamily"
+    case extendTrial = "extendTrial"
+    case refundTransaction = "refundTransaction"
+    case adjustPoints = "adjustPoints"
+    case resetUsage = "resetUsage"
+    case investigateFraud = "investigateFraud"
+}
+
+public struct AdminAction: Codable, Identifiable {
+    public let id: String
+    public let adminUserID: String
+    public let targetFamilyID: String
+    public let action: AdminActionType
+    public let reason: String
+    public let timestamp: Date
+    public let metadata: [String: String]
+
+    public init(
+        id: String = UUID().uuidString,
+        adminUserID: String,
+        targetFamilyID: String,
+        action: AdminActionType,
+        reason: String,
+        timestamp: Date = Date(),
+        metadata: [String: String] = [:]
+    ) {
+        self.id = id
+        self.adminUserID = adminUserID
+        self.targetFamilyID = targetFamilyID
+        self.action = action
+        self.reason = reason
+        self.timestamp = timestamp
+        self.metadata = metadata
+    }
+}
+
+public struct AdminSession: Codable, Identifiable {
+    public let id: String
+    public let adminUserID: String
+    public let sessionStartTime: Date
+    public var sessionEndTime: Date?
+    public let deviceInfo: [String: String]
+    public var actionsPerformed: [String] // Action IDs
+    public var isActive: Bool
+
+    public init(
+        id: String = UUID().uuidString,
+        adminUserID: String,
+        sessionStartTime: Date = Date(),
+        sessionEndTime: Date? = nil,
+        deviceInfo: [String: String] = [:],
+        actionsPerformed: [String] = [],
+        isActive: Bool = true
+    ) {
+        self.id = id
+        self.adminUserID = adminUserID
+        self.sessionStartTime = sessionStartTime
+        self.sessionEndTime = sessionEndTime
+        self.deviceInfo = deviceInfo
+        self.actionsPerformed = actionsPerformed
+        self.isActive = isActive
+    }
+}
+
+// MARK: - Family Invitation Models
+
+public struct FamilyInvitation: Codable, Identifiable {
+    public let id: UUID
+    public let familyID: String
+    public let invitingUserID: String
+    public let inviteeEmail: String?
+    public let token: UUID
+    public let createdAt: Date
+    public let expiresAt: Date
+    public var isUsed: Bool
+    public let deepLinkURL: String
+
+    public init(
+        id: UUID = UUID(),
+        familyID: String,
+        invitingUserID: String,
+        inviteeEmail: String? = nil,
+        token: UUID = UUID(),
+        createdAt: Date = Date(),
+        expiresAt: Date = Date().addingTimeInterval(72 * 60 * 60), // 72 hours
+        isUsed: Bool = false,
+        deepLinkURL: String
+    ) {
+        self.id = id
+        self.familyID = familyID
+        self.invitingUserID = invitingUserID
+        self.inviteeEmail = inviteeEmail
+        self.token = token
+        self.createdAt = createdAt
+        self.expiresAt = expiresAt
+        self.isUsed = isUsed
+        self.deepLinkURL = deepLinkURL
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol FamilyInvitationRepository {
+    func createInvitation(_ invitation: FamilyInvitation) async throws -> FamilyInvitation
+    func fetchInvitation(by token: UUID) async throws -> FamilyInvitation?
+    func fetchInvitations(for familyID: String) async throws -> [FamilyInvitation]
+    func fetchInvitations(by invitingUserID: String) async throws -> [FamilyInvitation]
+    func updateInvitation(_ invitation: FamilyInvitation) async throws -> FamilyInvitation
+    func deleteInvitation(id: UUID) async throws
+    func deleteExpiredInvitations() async throws
+}
+
+// MARK: - Repository Protocols for Audit
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol ValidationAuditRepository {
+    func createAuditLog(_ log: ValidationAuditLog) async throws -> ValidationAuditLog
+    func fetchAuditLogs(for familyID: String, eventType: ValidationEventType?) async throws -> [ValidationAuditLog]
+    func fetchAuditLogs(for familyID: String, since date: Date) async throws -> [ValidationAuditLog]
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol FraudDetectionRepository {
+    func createFraudEvent(_ event: FraudDetectionEvent) async throws -> FraudDetectionEvent
+    func fetchFraudEvents(for familyID: String) async throws -> [FraudDetectionEvent]
+    func fetchHighRiskEvents() async throws -> [FraudDetectionEvent]
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol AdminAuditRepository {
+    func createAdminAction(_ action: AdminAction) async throws -> AdminAction
+    func fetchAllActions() async throws -> [AdminAction]
+    func fetchActionsForFamily(_ familyID: String) async throws -> [AdminAction]
+    func fetchActionsByAdmin(_ adminUserID: String) async throws -> [AdminAction]
+}
+
+// MARK: - Parent Activity Models
+
+public enum ParentActivityType: String, Codable, CaseIterable {
+    case appCategorizationAdded = "appCategorizationAdded"
+    case appCategorizationModified = "appCategorizationModified"
+    case appCategorizationRemoved = "appCategorizationRemoved"
+    case pointsAdjusted = "pointsAdjusted"
+    case rewardRedeemed = "rewardRedeemed"
+    case childProfileModified = "childProfileModified"
+    case settingsUpdated = "settingsUpdated"
+    case childAdded = "childAdded"
+
+    public var displayName: String {
+        switch self {
+        case .appCategorizationAdded:
+            return "App Added to Category"
+        case .appCategorizationModified:
+            return "App Category Modified"
+        case .appCategorizationRemoved:
+            return "App Removed from Category"
+        case .pointsAdjusted:
+            return "Points Adjusted"
+        case .rewardRedeemed:
+            return "Reward Redeemed"
+        case .childProfileModified:
+            return "Child Profile Updated"
+        case .settingsUpdated:
+            return "Settings Updated"
+        case .childAdded:
+            return "Child Added"
+        }
+    }
+
+    public var icon: String {
+        switch self {
+        case .appCategorizationAdded, .appCategorizationModified, .appCategorizationRemoved:
+            return "apps.iphone"
+        case .pointsAdjusted:
+            return "star.fill"
+        case .rewardRedeemed:
+            return "gift.fill"
+        case .childProfileModified:
+            return "person.fill"
+        case .settingsUpdated:
+            return "gearshape.fill"
+        case .childAdded:
+            return "person.badge.plus.fill"
+        }
+    }
+}
+
+public struct ParentActivity: Codable, Identifiable, Equatable {
+    public let id: UUID
+    public let familyID: UUID
+    public let triggeringUserID: String
+    public let activityType: ParentActivityType
+    public let targetEntity: String
+    public let targetEntityID: UUID
+    public let changes: CodableDictionary
+    public let timestamp: Date
+    public let deviceID: String?
+
+    public init(
+        id: UUID = UUID(),
+        familyID: UUID,
+        triggeringUserID: String,
+        activityType: ParentActivityType,
+        targetEntity: String,
+        targetEntityID: UUID,
+        changes: CodableDictionary,
+        timestamp: Date = Date(),
+        deviceID: String? = nil
+    ) {
+        self.id = id
+        self.familyID = familyID
+        self.triggeringUserID = triggeringUserID
+        self.activityType = activityType
+        self.targetEntity = targetEntity
+        self.targetEntityID = targetEntityID
+        self.changes = changes
+        self.timestamp = timestamp
+        self.deviceID = deviceID
+    }
+}
+
+// MARK: - ParentActivity Extensions
+
+public extension ParentActivity {
+    var relativeTimestamp: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .named
+        return formatter.localizedString(for: timestamp, relativeTo: Date())
+    }
+
+    var detailedDescription: String {
+        let changes = self.changes.dictionary
+
+        switch activityType {
+        case .appCategorizationAdded:
+            let appName = changes["appName"] ?? "Unknown App"
+            let category = changes["category"] ?? "Unknown"
+            return "\(appName) was added to \(category) category"
+
+        case .appCategorizationModified:
+            let appName = changes["appName"] ?? "Unknown App"
+            let oldCategory = changes["oldCategory"] ?? "Unknown"
+            let newCategory = changes["newCategory"] ?? "Unknown"
+            return "\(appName) moved from \(oldCategory) to \(newCategory)"
+
+        case .appCategorizationRemoved:
+            let appName = changes["appName"] ?? "Unknown App"
+            let category = changes["category"] ?? "Unknown"
+            return "\(appName) was removed from \(category) category"
+
+        case .pointsAdjusted:
+            let childName = changes["childName"] ?? "Unknown Child"
+            let pointsChange = changes["pointsChange"] ?? "0"
+            let reason = changes["reason"] ?? "Manual adjustment"
+            return "\(childName)'s points adjusted by \(pointsChange) (\(reason))"
+
+        case .rewardRedeemed:
+            let childName = changes["childName"] ?? "Unknown Child"
+            let rewardName = changes["rewardName"] ?? "Unknown Reward"
+            let pointsSpent = changes["pointsSpent"] ?? "0"
+            return "\(childName) redeemed \(rewardName) for \(pointsSpent) points"
+
+        case .childProfileModified:
+            let childName = changes["childName"] ?? "Unknown Child"
+            let modifications = changes["modifications"] ?? "profile information"
+            return "\(childName)'s \(modifications) was updated"
+
+        case .settingsUpdated:
+            let settingsType = changes["settingsType"] ?? "family settings"
+            return "\(settingsType) were updated"
+
+        case .childAdded:
+            let childName = changes["childName"] ?? "Unknown Child"
+            return "\(childName) was added to the family"
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol ParentActivityRepository {
+    func createActivity(_ activity: ParentActivity) async throws -> ParentActivity
+    func fetchActivity(id: UUID) async throws -> ParentActivity?
+    func fetchActivities(for familyID: UUID, limit: Int?) async throws -> [ParentActivity]
+    func fetchActivities(for familyID: UUID, since date: Date) async throws -> [ParentActivity]
+    func fetchActivities(for familyID: UUID, dateRange: DateRange) async throws -> [ParentActivity]
+    func deleteActivity(id: UUID) async throws
+    func deleteOldActivities(olderThan date: Date) async throws
+}

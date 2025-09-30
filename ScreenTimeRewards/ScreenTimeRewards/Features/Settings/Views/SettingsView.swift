@@ -11,6 +11,7 @@ import ScreenTimeRewards
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
+    @StateObject private var familySharingViewModel = FamilySharingViewModel()
     @State private var notificationSettingsViewModel: NotificationSettingsViewModel?
 
     var body: some View {
@@ -32,6 +33,11 @@ struct SettingsView: View {
                 // Initialize notification settings view model when we have a child profile
                 if let settings = viewModel.settings {
                     notificationSettingsViewModel = NotificationSettingsViewModel(childProfileID: settings.id)
+                    // Load family sharing data
+                    await familySharingViewModel.loadFamilyData(
+                        familyID: settings.familyID,
+                        currentUserID: "current-user-id" // TODO: Get from auth service
+                    )
                 }
             }
             .alert("Save Error", isPresented: $viewModel.showError) {
@@ -53,6 +59,9 @@ struct SettingsView: View {
 
                 // App Restrictions Section
                 appRestrictionsSection
+
+                // Family Sharing Section
+                familySharingSection
 
                 // Subscription Management Section
                 subscriptionSection
@@ -114,6 +123,12 @@ struct SettingsView: View {
                     set: { viewModel.updateContentRestrictions($0) }
                 )
             )
+        }
+    }
+
+    private var familySharingSection: some View {
+        SettingsSection(title: "Family Sharing", icon: "person.2.fill", iconColor: .green) {
+            FamilySharingSection(viewModel: familySharingViewModel)
         }
     }
 

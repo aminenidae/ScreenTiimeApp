@@ -15,7 +15,7 @@ public final class TrialExpirationService: ObservableObject {
     public init(familyRepository: FamilyRepository) {
         self.familyRepository = familyRepository
         self.trialService = TrialEligibilityService(familyRepository: familyRepository)
-        self.featureGateService = FeatureGateService(familyRepository: familyRepository)
+        self.featureGateService = FeatureGateService.shared
     }
 
     /// Check and handle trial expiration for a family

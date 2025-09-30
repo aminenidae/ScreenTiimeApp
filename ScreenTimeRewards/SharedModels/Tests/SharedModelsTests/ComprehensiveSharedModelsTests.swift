@@ -917,17 +917,20 @@ final class ComprehensiveSharedModelsTests: XCTestCase {
         let entitlement = SubscriptionEntitlement(
             id: "entitlement-1",
             familyID: "family-1",
-            subscriptionType: "premium",
-            startDate: now,
-            endDate: endDate,
+            subscriptionTier: .oneChild,
+            receiptData: "receipt-data-123",
+            originalTransactionID: "orig-txn-123",
+            transactionID: "txn-123",
+            purchaseDate: now,
+            expirationDate: endDate,
             isActive: true
         )
         
         XCTAssertEqual(entitlement.id, "entitlement-1")
         XCTAssertEqual(entitlement.familyID, "family-1")
-        XCTAssertEqual(entitlement.subscriptionType, "premium")
-        XCTAssertEqual(entitlement.startDate, now)
-        XCTAssertEqual(entitlement.endDate, endDate)
+        XCTAssertEqual(entitlement.subscriptionTier, .oneChild)
+        XCTAssertEqual(entitlement.purchaseDate, now)
+        XCTAssertEqual(entitlement.expirationDate, endDate)
         XCTAssertTrue(entitlement.isActive)
     }
     
@@ -937,9 +940,12 @@ final class ComprehensiveSharedModelsTests: XCTestCase {
         let entitlement = SubscriptionEntitlement(
             id: "entitlement-1",
             familyID: "family-1",
-            subscriptionType: "premium",
-            startDate: now,
-            endDate: endDate,
+            subscriptionTier: .oneChild,
+            receiptData: "receipt-data-123",
+            originalTransactionID: "orig-txn-123",
+            transactionID: "txn-123",
+            purchaseDate: now,
+            expirationDate: endDate,
             isActive: true
         )
         
@@ -950,9 +956,9 @@ final class ComprehensiveSharedModelsTests: XCTestCase {
         
         XCTAssertEqual(entitlement.id, decodedEntitlement.id)
         XCTAssertEqual(entitlement.familyID, decodedEntitlement.familyID)
-        XCTAssertEqual(entitlement.subscriptionType, decodedEntitlement.subscriptionType)
-        XCTAssertEqual(entitlement.startDate.timeIntervalSince1970, decodedEntitlement.startDate.timeIntervalSince1970, accuracy: 0.001)
-        XCTAssertEqual(entitlement.endDate.timeIntervalSince1970, decodedEntitlement.endDate.timeIntervalSince1970, accuracy: 0.001)
+        XCTAssertEqual(entitlement.subscriptionTier, decodedEntitlement.subscriptionTier)
+        XCTAssertEqual(entitlement.purchaseDate.timeIntervalSince1970, decodedEntitlement.purchaseDate.timeIntervalSince1970, accuracy: 0.001)
+        XCTAssertEqual(entitlement.expirationDate.timeIntervalSince1970, decodedEntitlement.expirationDate.timeIntervalSince1970, accuracy: 0.001)
         XCTAssertEqual(entitlement.isActive, decodedEntitlement.isActive)
     }
     

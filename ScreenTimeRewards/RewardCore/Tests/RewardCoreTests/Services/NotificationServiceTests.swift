@@ -274,6 +274,8 @@ final class NotificationServiceTests: XCTestCase {
     }
 }
 
+// MARK: - Mock Classes
+
 // MARK: - Mock UNUserNotificationCenter
 
 class MockUNUserNotificationCenter: UNUserNotificationCenterProtocol {
@@ -311,13 +313,5 @@ class MockUNUserNotificationCenter: UNUserNotificationCenterProtocol {
 
     func checkAuthorizationStatus(completionHandler: @escaping (Bool) -> Void) {
         completionHandler(authorizationResult)
-    }
-}
-
-// Extension to make UNNotificationRequest's identifier mutable for testing
-extension UNNotificationRequest {
-    convenience init(identifier: String, content: UNNotificationContent, trigger: UNNotificationTrigger?) {
-        // This is a workaround to create a request with a specific identifier for testing
-        self.init(identifier: identifier, content: content, trigger: trigger)
     }
 }

@@ -8,6 +8,7 @@ final class SubscriptionStatusServiceTests: XCTestCase {
     var subscriptionStatusService: SubscriptionStatusService!
     var mockFamilyID: String!
 
+    @MainActor
     override func setUpWithError() throws {
         mockFamilyID = "test-family-id"
         subscriptionStatusService = SubscriptionStatusService(familyID: mockFamilyID)
@@ -20,6 +21,7 @@ final class SubscriptionStatusServiceTests: XCTestCase {
 
     // MARK: - Initialization Tests
 
+    @MainActor
     func testInitialization() {
         XCTAssertEqual(subscriptionStatusService.familyID, mockFamilyID)
         XCTAssertNil(subscriptionStatusService.currentStatus)
@@ -28,6 +30,7 @@ final class SubscriptionStatusServiceTests: XCTestCase {
         XCTAssertFalse(subscriptionStatusService.isMonitoring)
     }
 
+    @MainActor
     func testInitializationWithoutFamilyID() {
         let service = SubscriptionStatusService()
         XCTAssertNil(service.familyID)
@@ -146,17 +149,20 @@ final class SubscriptionStatusServiceTests: XCTestCase {
 
     // MARK: - Service Access Tests
 
+    @MainActor
     func testGetCurrentEntitlement() {
         // Initially should be nil
         XCTAssertNil(subscriptionStatusService.getCurrentEntitlement())
     }
 
+    @MainActor
     func testRenewalMonitorAccess() {
         let renewalMonitor = subscriptionStatusService.renewalMonitorInstance
         XCTAssertNotNil(renewalMonitor)
         XCTAssertEqual(renewalMonitor.renewalStatus, .unknown)
     }
 
+    @MainActor
     func testCancellationDetectorAccess() {
         let cancellationDetector = subscriptionStatusService.cancellationDetectorInstance
         XCTAssertNotNil(cancellationDetector)
@@ -180,6 +186,7 @@ final class SubscriptionStatusServiceTests: XCTestCase {
 
     // MARK: - Status Change Callback Tests
 
+    @MainActor
     func testStatusChangeCallback() {
         var receivedStatus: SharedModels.SubscriptionStatus?
         subscriptionStatusService.onStatusChanged = { status in
@@ -196,7 +203,8 @@ final class SubscriptionStatusServiceTests: XCTestCase {
 
     // MARK: - Monitoring State Tests
 
-    func testMonitoringState() {
+    @MainActor
+    func testMonitoringState() async {
         XCTAssertFalse(subscriptionStatusService.isMonitoring)
 
         subscriptionStatusService.stopMonitoring()
@@ -205,7 +213,8 @@ final class SubscriptionStatusServiceTests: XCTestCase {
 
     // MARK: - Error Handling Tests
 
-    func testServiceRobustness() {
+    @MainActor
+    func testServiceRobustness() async {
         // Test that service can handle being stopped when not started
         XCTAssertNoThrow(subscriptionStatusService.stopMonitoring())
 
@@ -215,6 +224,7 @@ final class SubscriptionStatusServiceTests: XCTestCase {
 
     // MARK: - Performance Tests
 
+    @MainActor
     func testPerformanceOfInitialization() {
         measure {
             for _ in 0..<100 {
