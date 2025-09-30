@@ -66,13 +66,8 @@ let package = Package(
             path: "RewardCore/Sources/RewardCore"
         ),
         .testTarget(
-            name: "TestUtilities",
-            dependencies: ["RewardCore"],
-            path: "RewardCore/Tests/TestUtilities"
-        ),
-        .testTarget(
             name: "RewardCoreTests",
-            dependencies: ["RewardCore", "TestUtilities"],
+            dependencies: ["RewardCore"],
             path: "RewardCore/Tests/RewardCoreTests"
         ),
         

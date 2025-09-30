@@ -14,23 +14,36 @@ public class CloudKitService {
     private let _pointToTimeRedemptionRepository: SharedModels.PointToTimeRedemptionRepository
     private let _familyRepository: SharedModels.FamilyRepository
     private let _parentCoordinationRepository: ParentCoordinationRepository
+    private let _rewardRepository: RewardRepository
+    private let _screenTimeRepository: ScreenTimeRepository
+    
+    // Public repository properties
+    public let rewardRepository: SharedModels.RewardRepository
+    public let screenTimeRepository: SharedModels.ScreenTimeSessionRepository
 
     private init() {
         // Initialize all repository implementations
         self._childProfileRepository = MockChildProfileRepository()
-        self._appCategorizationRepository = CloudKitService.AppCategorizationRepository()
+        self._appCategorizationRepository = CloudKitService.CloudKitAppCategorizationRepository()
         self._usageSessionRepository = CloudKitService.UsageSessionRepository()
         self._pointTransactionRepository = CloudKitService.PointTransactionRepository()
         self._pointToTimeRedemptionRepository = CloudKitService.PointToTimeRedemptionRepository()
         self._familyRepository = CloudKitService.FamilyRepository()
         self._parentCoordinationRepository = CloudKitParentCoordinationRepository()
+        // Initialize new repositories
+        self._rewardRepository = RewardRepository()
+        self._screenTimeRepository = ScreenTimeRepository()
+        
+        // Initialize public repository properties
+        self.rewardRepository = self._rewardRepository
+        self.screenTimeRepository = self._screenTimeRepository
     }
 
     // MARK: - Nested Repository Types
 
     /// Nested AppCategorizationRepository class for easy instantiation in tests
     @available(iOS 15.0, macOS 12.0, *)
-    public class AppCategorizationRepository: SharedModels.AppCategorizationRepository {
+    public class CloudKitAppCategorizationRepository: SharedModels.AppCategorizationRepository {
         public init() {}
 
         public func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
@@ -221,6 +234,62 @@ public class CloudKitService {
             print("Deleting family: \(id)")
         }
     }
+    
+    /// Nested RewardRepository class for easy instantiation in tests
+    @available(iOS 15.0, macOS 12.0, *)
+    public class RewardRepository: SharedModels.RewardRepository {
+        public init() {}
+
+        public func createReward(_ reward: Reward) async throws -> Reward {
+            print("Creating reward: \(reward.name)")
+            return reward
+        }
+
+        public func fetchReward(id: String) async throws -> Reward? {
+            return nil
+        }
+
+        public func fetchRewards() async throws -> [Reward] {
+            return []
+        }
+
+        public func updateReward(_ reward: Reward) async throws -> Reward {
+            print("Updating reward: \(reward.name)")
+            return reward
+        }
+
+        public func deleteReward(id: String) async throws {
+            print("Deleting reward: \(id)")
+        }
+    }
+    
+    /// Nested ScreenTimeRepository class for easy instantiation in tests
+    @available(iOS 15.0, macOS 12.0, *)
+    public class ScreenTimeRepository: SharedModels.ScreenTimeSessionRepository {
+        public init() {}
+
+        public func createSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession {
+            print("Creating screen time session for child: \(session.childProfileID)")
+            return session
+        }
+
+        public func fetchSession(id: String) async throws -> ScreenTimeSession? {
+            return nil
+        }
+
+        public func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [ScreenTimeSession] {
+            return []
+        }
+
+        public func updateSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession {
+            print("Updating screen time session: \(session.id)")
+            return session
+        }
+
+        public func deleteSession(id: String) async throws {
+            print("Deleting screen time session: \(id)")
+        }
+    }
 }
 
 // MARK: - Repository Protocol Conformance
@@ -383,6 +452,52 @@ extension CloudKitService: ParentCoordinationRepository {
 
     public func deleteCoordinationEvent(id: UUID) async throws {
         try await _parentCoordinationRepository.deleteCoordinationEvent(id: id)
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+extension CloudKitService: SharedModels.RewardRepository {
+    public func createReward(_ reward: Reward) async throws -> Reward {
+        return try await _rewardRepository.createReward(reward)
+    }
+
+    public func fetchReward(id: String) async throws -> Reward? {
+        return try await _rewardRepository.fetchReward(id: id)
+    }
+
+    public func fetchRewards() async throws -> [Reward] {
+        return try await _rewardRepository.fetchRewards()
+    }
+
+    public func updateReward(_ reward: Reward) async throws -> Reward {
+        return try await _rewardRepository.updateReward(reward)
+    }
+
+    public func deleteReward(id: String) async throws {
+        try await _rewardRepository.deleteReward(id: id)
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+extension CloudKitService: SharedModels.ScreenTimeSessionRepository {
+    public func createSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession {
+        return try await _screenTimeRepository.createSession(session)
+    }
+
+    public func fetchSession(id: String) async throws -> ScreenTimeSession? {
+        return try await _screenTimeRepository.fetchSession(id: id)
+    }
+
+    public func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [ScreenTimeSession] {
+        return try await _screenTimeRepository.fetchSessions(for: childID, dateRange: dateRange)
+    }
+
+    public func updateSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession {
+        return try await _screenTimeRepository.updateSession(session)
+    }
+
+    public func deleteSession(id: String) async throws {
+        try await _screenTimeRepository.deleteSession(id: id)
     }
 }
 

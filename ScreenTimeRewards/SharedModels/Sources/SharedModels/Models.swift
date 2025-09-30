@@ -28,6 +28,13 @@ public extension DateRange {
         let end = calendar.date(byAdding: .day, value: 1, to: start)!
         return DateRange(start: start, end: end)
     }
+    
+    static func today() -> DateRange {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: Date())
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        return DateRange(start: start, end: end)
+    }
 }
 
 public struct Family: Codable, Identifiable {
@@ -247,6 +254,17 @@ public struct ScreenTimeSession: Codable, Identifiable {
         self.endTime = endTime
         self.duration = duration
         self.pointsEarned = pointsEarned
+    }
+    
+    public init(childID: String, appName: String, duration: TimeInterval, timestamp: Date) {
+        self.id = UUID().uuidString
+        self.childProfileID = childID
+        self.appBundleID = appName
+        self.category = .learning
+        self.startTime = timestamp.addingTimeInterval(-duration)
+        self.endTime = timestamp
+        self.duration = duration
+        self.pointsEarned = 0
     }
 }
 
@@ -848,6 +866,24 @@ public protocol ChildProfileRepository {
 }
 
 @available(iOS 15.0, macOS 12.0, *)
+public protocol RewardRepository {
+    func createReward(_ reward: Reward) async throws -> Reward
+    func fetchReward(id: String) async throws -> Reward?
+    func fetchRewards() async throws -> [Reward]
+    func updateReward(_ reward: Reward) async throws -> Reward
+    func deleteReward(id: String) async throws
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol ScreenTimeSessionRepository {
+    func createSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession
+    func fetchSession(id: String) async throws -> ScreenTimeSession?
+    func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [ScreenTimeSession]
+    func updateSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession
+    func deleteSession(id: String) async throws
+}
+
+@available(iOS 15.0, macOS 12.0, *)
 public protocol AppCategorizationRepository {
     func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization
     func fetchAppCategorization(id: String) async throws -> AppCategorization?
@@ -1391,4 +1427,96 @@ public protocol ParentActivityRepository {
     func fetchActivities(for familyID: UUID, dateRange: DateRange) async throws -> [ParentActivity]
     func deleteActivity(id: UUID) async throws
     func deleteOldActivities(olderThan date: Date) async throws
+}
+
+// MARK: - Conflict Resolution Models
+
+public struct ConflictMetadata: Codable, Identifiable {
+    public let id: String
+    public let familyID: String
+    public let recordType: String
+    public let recordID: String
+    public let conflictingChanges: [ConflictChange]
+    public let resolutionStrategy: ResolutionStrategy
+    public let resolvedBy: String?
+    public let resolvedAt: Date?
+    public let metadata: [String: String]
+
+    public init(
+        id: String = UUID().uuidString,
+        familyID: String,
+        recordType: String,
+        recordID: String,
+        conflictingChanges: [ConflictChange],
+        resolutionStrategy: ResolutionStrategy,
+        resolvedBy: String? = nil,
+        resolvedAt: Date? = nil,
+        metadata: [String: String] = [:]
+    ) {
+        self.id = id
+        self.familyID = familyID
+        self.recordType = recordType
+        self.recordID = recordID
+        self.conflictingChanges = conflictingChanges
+        self.resolutionStrategy = resolutionStrategy
+        self.resolvedBy = resolvedBy
+        self.resolvedAt = resolvedAt
+        self.metadata = metadata
+    }
+}
+
+public struct ConflictChange: Codable {
+    public let userID: String
+    public let changeType: ChangeType
+    public let fieldChanges: [FieldChange]
+    public let timestamp: Date
+    public let deviceInfo: String
+
+    public init(
+        userID: String,
+        changeType: ChangeType,
+        fieldChanges: [FieldChange],
+        timestamp: Date,
+        deviceInfo: String
+    ) {
+        self.userID = userID
+        self.changeType = changeType
+        self.fieldChanges = fieldChanges
+        self.timestamp = timestamp
+        self.deviceInfo = deviceInfo
+    }
+}
+
+public enum ChangeType: String, Codable {
+    case create = "create"
+    case update = "update"
+    case delete = "delete"
+}
+
+public struct FieldChange: Codable {
+    public let fieldName: String
+    public let oldValue: String?
+    public let newValue: String?
+
+    public init(fieldName: String, oldValue: String?, newValue: String?) {
+        self.fieldName = fieldName
+        self.oldValue = oldValue
+        self.newValue = newValue
+    }
+}
+
+public enum ResolutionStrategy: String, Codable {
+    case automaticLastWriteWins = "automaticLastWriteWins"
+    case automaticMerge = "automaticMerge"
+    case manualSelection = "manualSelection"
+    case priorityBased = "priorityBased"
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public protocol ConflictMetadataRepository {
+    func createConflictMetadata(_ metadata: ConflictMetadata) async throws -> ConflictMetadata
+    func fetchConflictMetadata(id: String) async throws -> ConflictMetadata?
+    func fetchConflicts(for familyID: String) async throws -> [ConflictMetadata]
+    func updateConflictMetadata(_ metadata: ConflictMetadata) async throws -> ConflictMetadata
+    func deleteConflictMetadata(id: String) async throws
 }

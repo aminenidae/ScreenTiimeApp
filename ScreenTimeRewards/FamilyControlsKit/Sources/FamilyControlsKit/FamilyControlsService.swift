@@ -486,3 +486,27 @@ extension RewardTimeAllocationResult {
         }
     }
 }
+
+// MARK: - Device Activity Schedule
+
+/// Schedule for device activity monitoring
+public struct DeviceActivitySchedule {
+    public let start: Date
+    public let end: Date
+    
+    public init(start: Date, end: Date) {
+        self.start = start
+        self.end = end
+    }
+    
+    public static func dailySchedule(from startTime: Date, to endTime: Date) -> DeviceActivitySchedule {
+        return DeviceActivitySchedule(start: startTime, end: endTime)
+    }
+    
+    public static func allDay() -> DeviceActivitySchedule {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: Date())
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        return DeviceActivitySchedule(start: start, end: end)
+    }
+}
