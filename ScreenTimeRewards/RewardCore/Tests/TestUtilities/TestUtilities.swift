@@ -6,32 +6,34 @@ import CloudKitService
 
 // MARK: - Mock Repositories
 
-class MockChildProfileRepository: ChildProfileRepository {
-    var mockChild: ChildProfile?
-    var mockChildren: [ChildProfile] = []
-    var createdChildren: [ChildProfile] = []
-    var updatedChildren: [ChildProfile] = []
-    var shouldThrowError = false
-    var createChildCalled = false
-    var updateChildCalled = false
-    var deleteChildCalled = false
-    var fetchChildCalled = false
-    var fetchChildrenCalled = false
+public class MockChildProfileRepository: ChildProfileRepository {
+    public var mockChild: ChildProfile?
+    public var mockChildren: [ChildProfile] = []
+    public var createdChildren: [ChildProfile] = []
+    public var updatedChildren: [ChildProfile] = []
+    public var shouldThrowError = false
+    public var createChildCalled = false
+    public var updateChildCalled = false
+    public var deleteChildCalled = false
+    public var fetchChildCalled = false
+    public var fetchChildrenCalled = false
 
-    func createChild(_ child: ChildProfile) async throws -> ChildProfile {
+    public init() {}
+
+    public func createChild(_ child: ChildProfile) async throws -> ChildProfile {
         if shouldThrowError { throw MockError.repositoryError }
         createChildCalled = true
         createdChildren.append(child)
         return child
     }
 
-    func fetchChild(id: String) async throws -> ChildProfile? {
+    public func fetchChild(id: String) async throws -> ChildProfile? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchChildCalled = true
         return mockChild?.id == id ? mockChild : nil
     }
 
-    func fetchChildren(for familyID: String) async throws -> [ChildProfile] {
+    public func fetchChildren(for familyID: String) async throws -> [ChildProfile] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchChildrenCalled = true
         if let child = mockChild, child.familyID == familyID {
@@ -40,44 +42,46 @@ class MockChildProfileRepository: ChildProfileRepository {
         return mockChildren.filter { $0.familyID == familyID }
     }
 
-    func updateChild(_ child: ChildProfile) async throws -> ChildProfile {
+    public func updateChild(_ child: ChildProfile) async throws -> ChildProfile {
         if shouldThrowError { throw MockError.repositoryError }
         updateChildCalled = true
         updatedChildren.append(child)
         return child
     }
 
-    func deleteChild(id: String) async throws {
+    public func deleteChild(id: String) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         deleteChildCalled = true
     }
 }
 
-class MockAppCategorizationRepository: AppCategorizationRepository {
-    var mockCategorization: AppCategorization?
-    var mockCategorizations: [AppCategorization] = []
-    var createdCategorizations: [AppCategorization] = []
-    var updatedCategorizations: [AppCategorization] = []
-    var shouldThrowError = false
-    var createCalled = false
-    var updateCalled = false
-    var deleteCalled = false
-    var fetchCalled = false
+public class MockAppCategorizationRepository: SharedModels.AppCategorizationRepository {
+    public var mockCategorization: AppCategorization?
+    public var mockCategorizations: [AppCategorization] = []
+    public var createdCategorizations: [AppCategorization] = []
+    public var updatedCategorizations: [AppCategorization] = []
+    public var shouldThrowError = false
+    public var createCalled = false
+    public var updateCalled = false
+    public var deleteCalled = false
+    public var fetchCalled = false
 
-    func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
+    public init() {}
+
+    public func createAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
         if shouldThrowError { throw MockError.repositoryError }
         createCalled = true
         createdCategorizations.append(categorization)
         return categorization
     }
 
-    func fetchAppCategorization(id: String) async throws -> AppCategorization? {
+    public func fetchAppCategorization(id: String) async throws -> AppCategorization? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         return mockCategorization?.id == id ? mockCategorization : nil
     }
 
-    func fetchAppCategorizations(for childID: String) async throws -> [AppCategorization] {
+    public func fetchAppCategorizations(for childID: String) async throws -> [AppCategorization] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         if let categorization = mockCategorization, categorization.childProfileID == childID {
@@ -86,45 +90,49 @@ class MockAppCategorizationRepository: AppCategorizationRepository {
         return mockCategorizations.filter { $0.childProfileID == childID }
     }
 
-    func updateAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
+    public func updateAppCategorization(_ categorization: AppCategorization) async throws -> AppCategorization {
         if shouldThrowError { throw MockError.repositoryError }
         updateCalled = true
         updatedCategorizations.append(categorization)
         return categorization
     }
 
-    func deleteAppCategorization(id: String) async throws {
+    public func deleteAppCategorization(id: String) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         deleteCalled = true
     }
 }
 
-class MockFamilyRepository: FamilyRepository {
-    var mockFamily: Family?
-    var mockFamilies: [Family] = []
-    var createdFamilies: [Family] = []
-    var updatedFamilies: [Family] = []
-    var shouldThrowError = false
-    var createFamilyCalled = false
-    var updateFamilyCalled = false
-    var deleteFamilyCalled = false
-    var fetchFamilyCalled = false
+public class MockFamilyRepository: FamilyRepository {
+    public var mockFamily: Family?
+    public var mockFamilies: [Family] = []
+    public var families: [String: Family] = [:] // Add this property for tests that need it
+    public var createdFamilies: [Family] = []
+    public var updatedFamilies: [Family] = []
+    public var shouldThrowError = false
+    public var createFamilyCalled = false
+    public var updateFamilyCalled = false
+    public var deleteFamilyCalled = false
+    public var fetchFamilyCalled = false
 
-    func createFamily(_ family: Family) async throws -> Family {
+    public init() {}
+
+    public func createFamily(_ family: Family) async throws -> Family {
         if shouldThrowError { throw MockError.repositoryError }
         createFamilyCalled = true
         createdFamilies.append(family)
         mockFamily = family
+        families[family.id] = family // Also update the families dictionary
         return family
     }
 
-    func fetchFamily(id: String) async throws -> Family? {
+    public func fetchFamily(id: String) async throws -> Family? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchFamilyCalled = true
-        return mockFamily?.id == id ? mockFamily : nil
+        return mockFamily?.id == id ? mockFamily : families[id]
     }
 
-    func fetchFamilies(for userID: String) async throws -> [Family] {
+    public func fetchFamilies(for userID: String) async throws -> [Family] {
         if shouldThrowError { throw MockError.repositoryError }
         if let family = mockFamily,
            family.ownerUserID == userID || family.sharedWithUserIDs.contains(userID) {
@@ -135,48 +143,52 @@ class MockFamilyRepository: FamilyRepository {
         }
     }
 
-    func updateFamily(_ family: Family) async throws -> Family {
+    public func updateFamily(_ family: Family) async throws -> Family {
         if shouldThrowError { throw MockError.repositoryError }
         updateFamilyCalled = true
         updatedFamilies.append(family)
         mockFamily = family
+        families[family.id] = family // Also update the families dictionary
         return family
     }
 
-    func deleteFamily(id: String) async throws {
+    public func deleteFamily(id: String) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         deleteFamilyCalled = true
         if mockFamily?.id == id {
             mockFamily = nil
         }
+        families.removeValue(forKey: id) // Also remove from families dictionary
     }
 }
 
-class MockUsageSessionRepository: UsageSessionRepository {
-    var mockSession: UsageSession?
-    var mockSessions: [UsageSession] = []
-    var createdSessions: [UsageSession] = []
-    var updatedSessions: [UsageSession] = []
-    var shouldThrowError = false
-    var createCalled = false
-    var updateCalled = false
-    var deleteCalled = false
-    var fetchCalled = false
+public class MockUsageSessionRepository: SharedModels.UsageSessionRepository {
+    public var mockSession: UsageSession?
+    public var mockSessions: [UsageSession] = []
+    public var createdSessions: [UsageSession] = []
+    public var updatedSessions: [UsageSession] = []
+    public var shouldThrowError = false
+    public var createCalled = false
+    public var updateCalled = false
+    public var deleteCalled = false
+    public var fetchCalled = false
 
-    func createSession(_ session: UsageSession) async throws -> UsageSession {
+    public init() {}
+
+    public func createSession(_ session: UsageSession) async throws -> UsageSession {
         if shouldThrowError { throw MockError.repositoryError }
         createCalled = true
         createdSessions.append(session)
         return session
     }
 
-    func fetchSession(id: String) async throws -> UsageSession? {
+    public func fetchSession(id: String) async throws -> UsageSession? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         return mockSession?.id == id ? mockSession : nil
     }
 
-    func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [UsageSession] {
+    public func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [UsageSession] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         if let session = mockSession, session.childProfileID == childID {
@@ -185,44 +197,46 @@ class MockUsageSessionRepository: UsageSessionRepository {
         return mockSessions.filter { $0.childProfileID == childID }
     }
 
-    func updateSession(_ session: UsageSession) async throws -> UsageSession {
+    public func updateSession(_ session: UsageSession) async throws -> UsageSession {
         if shouldThrowError { throw MockError.repositoryError }
         updateCalled = true
         updatedSessions.append(session)
         return session
     }
 
-    func deleteSession(id: String) async throws {
+    public func deleteSession(id: String) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         deleteCalled = true
     }
 }
 
-class MockPointTransactionRepository: PointTransactionRepository {
-    var mockTransaction: PointTransaction?
-    var mockTransactions: [PointTransaction] = []
-    var createdTransactions: [PointTransaction] = []
-    var updatedTransactions: [PointTransaction] = []
-    var shouldThrowError = false
-    var createCalled = false
-    var updateCalled = false
-    var deleteCalled = false
-    var fetchCalled = false
+public class MockPointTransactionRepository: SharedModels.PointTransactionRepository {
+    public var mockTransaction: PointTransaction?
+    public var mockTransactions: [PointTransaction] = []
+    public var createdTransactions: [PointTransaction] = []
+    public var updatedTransactions: [PointTransaction] = []
+    public var shouldThrowError = false
+    public var createCalled = false
+    public var updateCalled = false
+    public var deleteCalled = false
+    public var fetchCalled = false
 
-    func createTransaction(_ transaction: PointTransaction) async throws -> PointTransaction {
+    public init() {}
+
+    public func createTransaction(_ transaction: PointTransaction) async throws -> PointTransaction {
         if shouldThrowError { throw MockError.repositoryError }
         createCalled = true
         createdTransactions.append(transaction)
         return transaction
     }
 
-    func fetchTransaction(id: String) async throws -> PointTransaction? {
+    public func fetchTransaction(id: String) async throws -> PointTransaction? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         return mockTransaction?.id == id ? mockTransaction : nil
     }
 
-    func fetchTransactions(for childID: String, limit: Int?) async throws -> [PointTransaction] {
+    public func fetchTransactions(for childID: String, limit: Int?) async throws -> [PointTransaction] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         if let transaction = mockTransaction, transaction.childProfileID == childID {
@@ -231,7 +245,7 @@ class MockPointTransactionRepository: PointTransactionRepository {
         return mockTransactions.filter { $0.childProfileID == childID }
     }
 
-    func fetchTransactions(for childID: String, dateRange: DateRange?) async throws -> [PointTransaction] {
+    public func fetchTransactions(for childID: String, dateRange: DateRange?) async throws -> [PointTransaction] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         if let transaction = mockTransaction, transaction.childProfileID == childID {
@@ -240,37 +254,39 @@ class MockPointTransactionRepository: PointTransactionRepository {
         return mockTransactions.filter { $0.childProfileID == childID }
     }
 
-    func deleteTransaction(id: String) async throws {
+    public func deleteTransaction(id: String) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         deleteCalled = true
     }
 }
 
-class MockPointToTimeRedemptionRepository: PointToTimeRedemptionRepository {
-    var mockRedemption: PointToTimeRedemption?
-    var mockRedemptions: [PointToTimeRedemption] = []
-    var createdRedemptions: [PointToTimeRedemption] = []
-    var updatedRedemptions: [PointToTimeRedemption] = []
-    var shouldThrowError = false
-    var createCalled = false
-    var updateCalled = false
-    var deleteCalled = false
-    var fetchCalled = false
+public class MockPointToTimeRedemptionRepository: SharedModels.PointToTimeRedemptionRepository {
+    public var mockRedemption: PointToTimeRedemption?
+    public var mockRedemptions: [PointToTimeRedemption] = []
+    public var createdRedemptions: [PointToTimeRedemption] = []
+    public var updatedRedemptions: [PointToTimeRedemption] = []
+    public var shouldThrowError = false
+    public var createCalled = false
+    public var updateCalled = false
+    public var deleteCalled = false
+    public var fetchCalled = false
 
-    func createPointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption {
+    public init() {}
+
+    public func createPointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption {
         if shouldThrowError { throw MockError.repositoryError }
         createCalled = true
         createdRedemptions.append(redemption)
         return redemption
     }
 
-    func fetchPointToTimeRedemption(id: String) async throws -> PointToTimeRedemption? {
+    public func fetchPointToTimeRedemption(id: String) async throws -> PointToTimeRedemption? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         return mockRedemption?.id == id ? mockRedemption : nil
     }
 
-    func fetchPointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption] {
+    public func fetchPointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         if let redemption = mockRedemption, redemption.childProfileID == childID {
@@ -279,20 +295,20 @@ class MockPointToTimeRedemptionRepository: PointToTimeRedemptionRepository {
         return mockRedemptions.filter { $0.childProfileID == childID }
     }
 
-    func fetchActivePointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption] {
+    public func fetchActivePointToTimeRedemptions(for childID: String) async throws -> [PointToTimeRedemption] {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         return mockRedemptions.filter { $0.childProfileID == childID && $0.status == .active }
     }
 
-    func updatePointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption {
+    public func updatePointToTimeRedemption(_ redemption: PointToTimeRedemption) async throws -> PointToTimeRedemption {
         if shouldThrowError { throw MockError.repositoryError }
         updateCalled = true
         updatedRedemptions.append(redemption)
         return redemption
     }
 
-    func deletePointToTimeRedemption(id: String) async throws {
+    public func deletePointToTimeRedemption(id: String) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         deleteCalled = true
     }
@@ -300,17 +316,19 @@ class MockPointToTimeRedemptionRepository: PointToTimeRedemptionRepository {
 
 // MARK: - Mock CloudKit Service
 
-class MockCloudKitService {
-    var mockFamily: Family?
-    var mockFamilies: [Family] = []
-    var shouldThrowError = false
+public class MockCloudKitService {
+    public var mockFamily: Family?
+    public var mockFamilies: [Family] = []
+    public var shouldThrowError = false
     
-    func fetchFamily(id: String) async throws -> Family? {
+    public init() {}
+    
+    public func fetchFamily(id: String) async throws -> Family? {
         if shouldThrowError { throw MockError.cloudKitError }
         return mockFamily?.id == id ? mockFamily : nil
     }
     
-    func fetchFamilies(for userID: String) async throws -> [Family] {
+    public func fetchFamilies(for userID: String) async throws -> [Family] {
         if shouldThrowError { throw MockError.cloudKitError }
         if let family = mockFamily,
            family.ownerUserID == userID || family.sharedWithUserIDs.contains(userID) {
@@ -321,7 +339,7 @@ class MockCloudKitService {
         }
     }
     
-    func saveFamily(_ family: Family) async throws {
+    public func saveFamily(_ family: Family) async throws {
         if shouldThrowError { throw MockError.cloudKitError }
         mockFamily = family
     }
@@ -329,49 +347,51 @@ class MockCloudKitService {
 
 // MARK: - Mock Family Invitation Repository
 
-class MockFamilyInvitationRepository: FamilyInvitationRepository {
-    var invitations: [UUID: FamilyInvitation] = [:]
-    var shouldThrowError = false
-    var createCalled = false
-    var fetchCalled = false
-    var updateCalled = false
+public class MockFamilyInvitationRepository: FamilyInvitationRepository {
+    public var invitations: [UUID: FamilyInvitation] = [:]
+    public var shouldThrowError = false
+    public var createCalled = false
+    public var fetchCalled = false
+    public var updateCalled = false
 
-    func createInvitation(_ invitation: FamilyInvitation) async throws -> FamilyInvitation {
+    public init() {}
+
+    public func createInvitation(_ invitation: FamilyInvitation) async throws -> FamilyInvitation {
         if shouldThrowError { throw MockError.repositoryError }
         createCalled = true
         invitations[invitation.token] = invitation
         return invitation
     }
 
-    func fetchInvitation(by token: UUID) async throws -> FamilyInvitation? {
+    public func fetchInvitation(by token: UUID) async throws -> FamilyInvitation? {
         if shouldThrowError { throw MockError.repositoryError }
         fetchCalled = true
         return invitations[token]
     }
 
-    func fetchInvitations(for familyID: String) async throws -> [FamilyInvitation] {
+    public func fetchInvitations(for familyID: String) async throws -> [FamilyInvitation] {
         if shouldThrowError { throw MockError.repositoryError }
         return Array(invitations.values).filter { $0.familyID == familyID }
     }
 
-    func fetchInvitations(by invitingUserID: String) async throws -> [FamilyInvitation] {
+    public func fetchInvitations(by invitingUserID: String) async throws -> [FamilyInvitation] {
         if shouldThrowError { throw MockError.repositoryError }
         return Array(invitations.values).filter { $0.invitingUserID == invitingUserID }
     }
 
-    func updateInvitation(_ invitation: FamilyInvitation) async throws -> FamilyInvitation {
+    public func updateInvitation(_ invitation: FamilyInvitation) async throws -> FamilyInvitation {
         if shouldThrowError { throw MockError.repositoryError }
         updateCalled = true
         invitations[invitation.token] = invitation
         return invitation
     }
 
-    func deleteInvitation(id: UUID) async throws {
+    public func deleteInvitation(id: UUID) async throws {
         if shouldThrowError { throw MockError.repositoryError }
         invitations.removeValue(forKey: id)
     }
 
-    func deleteExpiredInvitations() async throws {
+    public func deleteExpiredInvitations() async throws {
         if shouldThrowError { throw MockError.repositoryError }
         let now = Date()
         invitations = invitations.filter { $0.value.expiresAt > now }
@@ -380,13 +400,13 @@ class MockFamilyInvitationRepository: FamilyInvitationRepository {
 
 // MARK: - Mock Error
 
-enum MockError: Error {
+public enum MockError: Error {
     case repositoryError
     case cloudKitError
 }
 
 extension MockError: LocalizedError {
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .repositoryError:
             return "Mock repository error"
@@ -398,7 +418,7 @@ extension MockError: LocalizedError {
 
 // MARK: - Test Data Helpers
 
-func createMockFamily(id: String = UUID().uuidString, name: String = "Test Family", ownerUserID: String, sharedWithUserIDs: [String] = [], childProfileIDs: [String] = []) -> Family {
+public func createMockFamily(id: String = UUID().uuidString, name: String = "Test Family", ownerUserID: String, sharedWithUserIDs: [String] = [], childProfileIDs: [String] = []) -> Family {
     return Family(
         id: id,
         name: name,

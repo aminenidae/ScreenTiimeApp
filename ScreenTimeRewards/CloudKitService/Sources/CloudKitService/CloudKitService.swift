@@ -1,6 +1,34 @@
 import Foundation
 import SharedModels
 
+// MARK: - Supporting Types
+
+public struct RedemptionStats {
+    public let totalRedemptions: Int
+    public let totalPointsSpent: Int
+    public let totalTimeGranted: Int // in minutes
+    public let totalTimeUsed: Int // in minutes
+    public let activeRedemptions: Int
+
+    public init(totalRedemptions: Int, totalPointsSpent: Int, totalTimeGranted: Int, totalTimeUsed: Int, activeRedemptions: Int) {
+        self.totalRedemptions = totalRedemptions
+        self.totalPointsSpent = totalPointsSpent
+        self.totalTimeGranted = totalTimeGranted
+        self.totalTimeUsed = totalTimeUsed
+        self.activeRedemptions = activeRedemptions
+    }
+
+    public var efficiencyRatio: Double {
+        guard totalTimeGranted > 0 else { return 0.0 }
+        return Double(totalTimeUsed) / Double(totalTimeGranted)
+    }
+
+    public var averagePointsPerMinute: Double {
+        guard totalTimeGranted > 0 else { return 0.0 }
+        return Double(totalPointsSpent) / Double(totalTimeGranted)
+    }
+}
+
 /// Main CloudKit service that provides access to all repository implementations
 @available(iOS 15.0, macOS 12.0, *)
 public class CloudKitService {
@@ -478,28 +506,9 @@ extension CloudKitService: SharedModels.RewardRepository {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
-extension CloudKitService: SharedModels.ScreenTimeSessionRepository {
-    public func createSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession {
-        return try await _screenTimeRepository.createSession(session)
-    }
-
-    public func fetchSession(id: String) async throws -> ScreenTimeSession? {
-        return try await _screenTimeRepository.fetchSession(id: id)
-    }
-
-    public func fetchSessions(for childID: String, dateRange: DateRange?) async throws -> [ScreenTimeSession] {
-        return try await _screenTimeRepository.fetchSessions(for: childID, dateRange: dateRange)
-    }
-
-    public func updateSession(_ session: ScreenTimeSession) async throws -> ScreenTimeSession {
-        return try await _screenTimeRepository.updateSession(session)
-    }
-
-    public func deleteSession(id: String) async throws {
-        try await _screenTimeRepository.deleteSession(id: id)
-    }
-}
+// REMOVED: ScreenTimeSessionRepository extension to resolve method ambiguity
+// The UsageSessionRepository extension already provides the deleteSession method
+// with the same signature, causing compilation errors.
 
 // MARK: - Mock Child Profile Repository
 

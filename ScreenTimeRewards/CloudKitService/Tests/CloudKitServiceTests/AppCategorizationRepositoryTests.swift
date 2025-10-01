@@ -3,11 +3,11 @@ import XCTest
 import SharedModels
 
 final class AppCategorizationRepositoryTests: XCTestCase {
-    var repository: CloudKitService.AppCategorizationRepository!
+    var repository: CloudKitService.CloudKitAppCategorizationRepository!
 
     override func setUp() {
         super.setUp()
-        repository = CloudKitService.AppCategorizationRepository()
+        repository = CloudKitService.CloudKitAppCategorizationRepository()
     }
 
     override func tearDown() {

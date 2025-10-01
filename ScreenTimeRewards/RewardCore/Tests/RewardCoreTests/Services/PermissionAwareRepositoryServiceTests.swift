@@ -1,6 +1,8 @@
 import XCTest
 import SharedModels
 @testable import RewardCore
+@testable import TestUtilities
+import CloudKitService
 
 @available(iOS 15.0, macOS 12.0, *)
 final class PermissionAwareRepositoryServiceTests: XCTestCase {
@@ -22,7 +24,7 @@ final class PermissionAwareRepositoryServiceTests: XCTestCase {
         mockPointTransactionRepository = MockPointTransactionRepository()
 
         permissionService = PermissionService(
-            cloudKitService: mockFamilyRepository,
+            cloudKitService: CloudKitService.shared,
             currentUserID: "test-user"
         )
 
@@ -326,7 +328,3 @@ final class PermissionAwareRepositoryServiceTests: XCTestCase {
         XCTAssertTrue(members.contains { $0.userID == "coparent-user" && $0.role == .coParent })
     }
 }
-
-// MARK: - Mock Repositories
-
-// All mock repositories have been moved to TestUtilities.swift to avoid duplication
