@@ -1,0 +1,24 @@
+{
+  "bundleIdentifiers": [
+    {
+      "identifier": "com.screentimerewards.app",
+      "name": "Screen Time Rewards Main App",
+      "platform": "IOS",
+      "enabled": true
+    },
+    {
+      "identifier": "com.screentimerewards.app.widget",
+      "name": "Screen Time Rewards Widget Extension",
+      "platform": "IOS",
+      "enabled": true
+    },
+    {
+      "identifier": "com.screentimerewards.app.intents",
+      "name": "Screen Time Rewards App Intents Extension",
+      "platform": "IOS",
+      "enabled": true
+    }
+  ],
+  "primaryBundleId": "com.screentimerewards.app",
+  "cloudKitContainer": "iCloud.com.screentimerewards.app"
+}

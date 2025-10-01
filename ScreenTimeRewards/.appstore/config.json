@@ -1,0 +1,64 @@
+{
+  "app": {
+    "bundleId": "com.screentimerewards.app",
+    "name": "Screen Time Rewards",
+    "primaryLanguage": "en-US",
+    "description": "A comprehensive iOS application that transforms screen time management into a positive, gamified experience for families.",
+    "privacyPolicyURL": "https://example.com/privacy",
+    "supportURL": "https://example.com/support",
+    "marketingURL": "https://screentimerewards.com",
+    "subtitle": "Gamified Screen Time Management for Families",
+    "primaryCategory": "LIFESTYLE",
+    "secondaryCategory": "EDUCATION",
+    "primaryCategoryFamily": "LIFESTYLE",
+    "secondaryCategoryFamily": "EDUCATION",
+    "priceTier": "0",
+    "sku": "SCREEN_TIME_REWARDS_001",
+    "bundleIdSuffix": "app"
+  },
+  "ratings": {
+    "ageRating": "4+",
+    "restrictedCategories": [],
+    "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+    "contests": "NONE",
+    "gambling": "NONE",
+    "gamblingSimulated": "NONE",
+    "horrorOrFearThemes": "NONE",
+    "matureOrSuggestiveThemes": "NONE",
+    "medicalOrTreatmentInformation": "NONE",
+    "profanityOrCrudeHumor": "NONE",
+    "sexualContentGraphicAndNudity": "NONE",
+    "sexualContentOrNudity": "NONE",
+    "violenceCartoonOrFantasy": "NONE",
+    "violenceRealistic": "NONE",
+    "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+    "gamblingAndContests": "NO"
+  },
+  "review": {
+    "contactFirstName": "Development",
+    "contactLastName": "Team",
+    "contactPhone": "+1-000-000-0000",
+    "contactEmail": "app-review@screentimerewards.com",
+    "demoAccountRequired": false,
+    "demoAccountName": "",
+    "demoAccountPassword": "",
+    "notes": "This app requires Family Controls entitlement and iCloud account with Family Sharing enabled for full functionality. Please test on a physical iOS device with iOS 15.0+ and ensure Family Sharing is enabled."
+  },
+  "screenshots": {
+    "deviceTypes": ["IPHONE_65", "IPAD_PRO_3GEN_129"],
+    "languages": ["en-US"]
+  },
+  "testflight": {
+    "internalTesters": ["developers@screentimerewards.com"],
+    "betaReviewInfo": {
+      "contactFirstName": "Development",
+      "contactLastName": "Team",
+      "contactPhone": "+1-000-000-0000",
+      "contactEmail": "development@screentimerewards.com",
+      "demoAccountRequired": false,
+      "demoAccountName": "",
+      "demoAccountPassword": "",
+      "notes": "This app requires Family Controls entitlement and iCloud account with Family Sharing enabled for full functionality."
+    }
+  }
+}

@@ -1,0 +1,62 @@
+# SwiftLint Configuration
+
+# Included paths
+included:
+  - Packages
+  - ScreenTimeRewards
+  - Tests
+
+# Excluded paths
+excluded:
+  - Packages/*/Tests
+  - .build
+  - .swiftpm
+
+# Rules
+opt_in_rules:
+  - force_unwrapping
+  - implicit_return
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - empty_count
+  - empty_string
+
+disabled_rules:
+  - identifier_name
+  - line_length
+  - type_body_length
+  - file_length
+  - function_body_length
+  - cyclomatic_complexity
+
+# Rule configurations
+force_cast: error
+force_try: error
+function_parameter_count: 
+  warning: 6
+  error: 8
+implicit_return: error
+force_unwrapping: error
+
+# Custom rules
+custom_rules:
+  no_objc:
+    included: ".*\\.swift"
+    regex: "@objc"
+    match_kinds: attribute.builtin
+    message: "Explicit @objc usage is discouraged"
+    severity: warning
+    
+  no_print:
+    included: ".*\\.swift"
+    regex: "print\\("
+    match_kinds: identifier
+    message: "print() statements are not allowed in production code"
+    severity: error
+    
+  no_debugger:
+    included: ".*\\.swift"
+    regex: "debugger\\(\\)"
+    match_kinds: identifier
+    message: "debugger() statements are not allowed"
+    severity: error

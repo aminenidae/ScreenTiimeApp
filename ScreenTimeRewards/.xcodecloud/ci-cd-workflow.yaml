@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+description: Automated CI/CD pipeline for Screen Time Rewards
+
+# Trigger configuration
+triggers:
+  - push:
+      branches:
+        - main
+  - pull_request:
+      branches:
+        - main
+
+# Build environment
+environment:
+  platform: iOS
+  version: 15.0
+  xcode: 15.0
+
+# Pre-build actions
+pre:
+  - script:
+      path: Scripts/environment-setup.sh
+      name: Environment Setup
+  - script:
+      path: Scripts/certificates-setup.sh
+      name: Certificates Setup
+
+# Build actions
+actions:
+  - build:
+      name: Build and Test
+      scheme: ScreenTimeRewards-Package
+      destination: iOS Simulator
+      actions:
+        - build
+        - test
+      configuration: Debug
+      scripts:
+        - path: Scripts/code-quality.sh
+          name: Code Quality Checks
+        - path: Scripts/build-and-test.sh
+          name: Build and Test Script
+      test_plan: ScreenTimeRewardsTests
+
+# Post-build actions
+post:
+  - analyze:
+      name: Code Analysis
+      tools:
+        - swiftlint
+        - swiftformat
